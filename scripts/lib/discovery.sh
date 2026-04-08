@@ -84,12 +84,14 @@ build_known_paths() {
         done
     fi
 
-    # --- D. Claude Code native (silently skipped) ---
+    # --- D. Claude Code native + kit-managed settings (silently skipped) ---
     local native_paths=(
         ".claude/settings.json"
         ".claude/settings.local.json"
         ".claude/worktrees"
     )
+    # Note: .claude/settings.json is now kit-managed (SessionStart hooks)
+    # but kept in native_paths to avoid flagging as unknown
     for p in "${native_paths[@]}"; do
         KNOWN_PATHS["$p"]="native"
     done

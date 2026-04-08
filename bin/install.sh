@@ -13,6 +13,8 @@ if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; t
     mkdir -p "$INSTALL_DIR"
     # On Windows, copy instead of symlink (symlinks need admin)
     cp "$CLI" "$INSTALL_DIR/claude-ops"
+    # Bake the real kit root into the copy so VERSION resolution works
+    sed -i "s|^KIT_ROOT=.*|KIT_ROOT=\"$KIT_ROOT\"|" "$INSTALL_DIR/claude-ops"
     echo "Installed claude-ops to $INSTALL_DIR/claude-ops"
     echo ""
     echo "Ensure $INSTALL_DIR is in your PATH:"

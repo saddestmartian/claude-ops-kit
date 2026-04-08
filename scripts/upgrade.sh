@@ -43,7 +43,7 @@ if ! command -v jq &>/dev/null; then
 fi
 
 PROJECT_VERSION=$(jq -r '.version' "$MANIFEST")
-KIT_VERSION="1.0.0"  # Read from kit's version file in production
+KIT_VERSION="$(cat "$KIT_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
 
 printf "${BOLD}claude-ops upgrade${RESET}\n"
 printf "  Project version: %s\n" "$PROJECT_VERSION"
@@ -89,10 +89,44 @@ done
 PROJECT_NAME=$(jq -r '.project.name // "unknown"' "$MANIFEST" 2>/dev/null || echo "unknown")
 run_discovery "$KIT_ROOT" "$TARGET_DIR" "$PROJECT_NAME" "$NO_DISCOVER"
 
-# Update manifest version
+# Update check-version.sh to latest
+BASELINE="$KIT_ROOT/templates/baseline"
+if [[ -f "$BASELINE/scripts/check-version.sh" ]]; then
+    cp "$BASELINE/scripts/check-version.sh" "$TARGET_DIR/scripts/check-version.sh"
+    chmod +x "$TARGET_DIR/scripts/check-version.sh"
+    printf "  ${GREEN}+ Updated${RESET}: scripts/check-version.sh\n"
+fi
+
+# Ensure SessionStart hook exists
+SETTINGS_FILE="$TARGET_DIR/.claude/settings.json"
+HOOK_CMD="bash scripts/check-version.sh"
+if [[ -f "$SETTINGS_FILE" ]]; then
+    if ! jq -e ".hooks.SessionStart[]? | select(.command == \"$HOOK_CMD\")" "$SETTINGS_FILE" &>/dev/null; then
+        jq --arg cmd "$HOOK_CMD" '.hooks = (.hooks // {}) | .hooks.SessionStart = ((.hooks.SessionStart // []) + [{"command": $cmd, "timeout": 5000}])' \
+            "$SETTINGS_FILE" > "${SETTINGS_FILE}.tmp" && mv "${SETTINGS_FILE}.tmp" "$SETTINGS_FILE"
+        printf "  ${GREEN}+ Added${RESET}: version check hook to .claude/settings.json\n"
+    fi
+elif [[ ! -f "$SETTINGS_FILE" ]]; then
+    mkdir -p "$TARGET_DIR/.claude"
+    cat > "$SETTINGS_FILE" <<'SETTINGSJSON'
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "command": "bash scripts/check-version.sh",
+        "timeout": 5000
+      }
+    ]
+  }
+}
+SETTINGSJSON
+    printf "  ${GREEN}+ Created${RESET}: .claude/settings.json with version check hook\n"
+fi
+
+# Update manifest version and kitPath
 TODAY=$(date +%Y-%m-%d)
-jq --arg ver "$KIT_VERSION" --arg date "$TODAY" \
-    '.version = $ver | .lastUpgrade = $date' \
+jq --arg ver "$KIT_VERSION" --arg date "$TODAY" --arg kp "$KIT_ROOT" \
+    '.version = $ver | .lastUpgrade = $date | .kitPath = $kp' \
     "$MANIFEST" > "${MANIFEST}.tmp" && mv "${MANIFEST}.tmp" "$MANIFEST"
 
 echo ""

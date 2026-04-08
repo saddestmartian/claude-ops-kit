@@ -19,7 +19,7 @@ printf "${BOLD}claude-ops status${RESET}\n"
 echo ""
 
 # Kit version
-KIT_VERSION=$(grep '"version"' "$KIT_ROOT/bin/claude-ops" 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+KIT_VERSION="$(cat "$KIT_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
 printf "  Kit version:     ${CYAN}%s${RESET}\n" "$KIT_VERSION"
 
 # Project manifest

@@ -7,7 +7,7 @@ set -euo pipefail
 KIT_ROOT="${1:?Usage: adopt.sh <kit-root>}"
 shift
 
-VERSION="1.0.0"
+VERSION="$(cat "$KIT_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
 TARGET_DIR="$(pwd)"
 
 # Colors
@@ -366,6 +366,42 @@ else
     skip "  scripts/verify-sync.sh (exists)"
 fi
 
+if [[ ! -f "$TARGET_DIR/scripts/check-version.sh" ]]; then
+    cp "$BASELINE/scripts/check-version.sh" "$TARGET_DIR/scripts/check-version.sh"
+    chmod +x "$TARGET_DIR/scripts/check-version.sh"
+    ok "  scripts/check-version.sh (added)"
+else
+    skip "  scripts/check-version.sh (exists)"
+fi
+
+# --- SessionStart hook for version check ---
+SETTINGS_FILE="$TARGET_DIR/.claude/settings.json"
+HOOK_CMD="bash scripts/check-version.sh"
+if [[ -f "$SETTINGS_FILE" ]] && command -v jq &>/dev/null; then
+    # Check if hook already exists
+    if ! jq -e ".hooks.SessionStart[]? | select(.command == \"$HOOK_CMD\")" "$SETTINGS_FILE" &>/dev/null; then
+        jq --arg cmd "$HOOK_CMD" '.hooks = (.hooks // {}) | .hooks.SessionStart = ((.hooks.SessionStart // []) + [{"command": $cmd, "timeout": 5000}])' \
+            "$SETTINGS_FILE" > "${SETTINGS_FILE}.tmp" && mv "${SETTINGS_FILE}.tmp" "$SETTINGS_FILE"
+        ok "  .claude/settings.json (version check hook added)"
+    else
+        skip "  .claude/settings.json (version check hook exists)"
+    fi
+elif [[ ! -f "$SETTINGS_FILE" ]]; then
+    cat > "$SETTINGS_FILE" <<'SETTINGSJSON'
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "command": "bash scripts/check-version.sh",
+        "timeout": 5000
+      }
+    ]
+  }
+}
+SETTINGSJSON
+    ok "  .claude/settings.json (created with version check hook)"
+fi
+
 # --- Workflow feedback rule (empty accumulator, only if missing) ---
 if [[ ! -f "$TARGET_DIR/.claude/rules/workflow-feedback.md" ]]; then
     cat > "$TARGET_DIR/.claude/rules/workflow-feedback.md" <<'RULE'
@@ -446,6 +482,7 @@ cat > "$TARGET_DIR/claude-ops.json" <<MANIFEST
 {
   "version": "${VERSION}",
   "kitRepo": "saddestmartian/claude-ops-kit",
+  "kitPath": "${KIT_ROOT}",
   "adoptedFrom": "existing",
   "project": {
     "name": "${PROJECT_NAME}",

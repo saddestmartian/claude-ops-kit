@@ -5,7 +5,7 @@ set -euo pipefail
 KIT_ROOT="${1:?Usage: init.sh <kit-root>}"
 shift
 
-VERSION="1.0.0"
+VERSION="$(cat "$KIT_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
 TARGET_DIR="$(pwd)"
 
 # Colors
@@ -294,7 +294,24 @@ cp "$BASELINE/scripts/sync-memory.sh" "$TARGET_DIR/scripts/sync-memory.sh"
 chmod +x "$TARGET_DIR/scripts/sync-memory.sh"
 render_template "$BASELINE/scripts/verify-sync.sh.tmpl" "$TARGET_DIR/scripts/verify-sync.sh"
 chmod +x "$TARGET_DIR/scripts/verify-sync.sh"
-info "scripts/ (sync-memory.sh, verify-sync.sh)"
+cp "$BASELINE/scripts/check-version.sh" "$TARGET_DIR/scripts/check-version.sh"
+chmod +x "$TARGET_DIR/scripts/check-version.sh"
+info "scripts/ (sync-memory.sh, verify-sync.sh, check-version.sh)"
+
+# Claude Code settings with SessionStart hooks
+cat > "$TARGET_DIR/.claude/settings.json" <<'SETTINGSJSON'
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "command": "bash scripts/check-version.sh",
+        "timeout": 5000
+      }
+    ]
+  }
+}
+SETTINGSJSON
+info ".claude/settings.json (SessionStart version check hook)"
 
 # Empty workflow-feedback rule
 cat > "$TARGET_DIR/.claude/rules/workflow-feedback.md" <<'RULE'
@@ -450,6 +467,7 @@ cat > "$TARGET_DIR/claude-ops.json" <<MANIFEST
 {
   "version": "${VERSION}",
   "kitRepo": "saddestmartian/claude-ops-kit",
+  "kitPath": "${KIT_ROOT}",
   "project": {
     "name": "${PROJECT_NAME}",
     "repo": "${GITHUB_ORG}/${PROJECT_NAME}",
