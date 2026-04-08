@@ -12,6 +12,7 @@ TARGET_DIR="$(pwd)"
 GREEN="\033[0;32m"
 CYAN="\033[0;36m"
 YELLOW="\033[0;33m"
+RED="\033[0;31m"
 BOLD="\033[1m"
 RESET="\033[0m"
 
@@ -23,12 +24,49 @@ header() { printf "\n${BOLD}%s${RESET}\n" "$1"; }
 # ---------------------------------------------------------------------------
 # Phase 1: Detection
 # ---------------------------------------------------------------------------
+FORCE=false
+NO_DISCOVER=false
+for arg in "$@"; do
+    case "$arg" in
+        --overwrite) FORCE=true ;;
+        --no-discover) NO_DISCOVER=true ;;
+    esac
+done
+
+# Shared discovery library
+source "$KIT_ROOT/scripts/lib/discovery.sh"
+
 header "claude-ops init v${VERSION}"
 
 if [[ -f "$TARGET_DIR/claude-ops.json" ]]; then
     echo "This project is already initialized (claude-ops.json exists)."
     echo "Use 'claude-ops upgrade' to update templates."
     exit 1
+fi
+
+# Block if existing Claude Code content is detected (use adopt instead)
+if [[ "$FORCE" != true ]]; then
+    existing_found=()
+    [[ -f "$TARGET_DIR/CLAUDE.md" ]] && existing_found+=("CLAUDE.md")
+    [[ -d "$TARGET_DIR/.claude/rules" ]] && existing_found+=(".claude/rules/")
+    [[ -f "$TARGET_DIR/.claude/MEMORY.md" ]] && existing_found+=(".claude/MEMORY.md")
+    [[ -d "$TARGET_DIR/.claude/skills" ]] && existing_found+=(".claude/skills/")
+    [[ -d "$TARGET_DIR/.claude/agents" ]] && existing_found+=(".claude/agents/")
+    [[ -f "$TARGET_DIR/PROJECT_STATE.md" ]] && existing_found+=("PROJECT_STATE.md")
+
+    if [[ ${#existing_found[@]} -gt 0 ]]; then
+        printf "${RED}✖ Existing Claude Code setup detected:${RESET}\n"
+        for item in "${existing_found[@]}"; do
+            printf "    • %s\n" "$item"
+        done
+        echo ""
+        echo "  init is designed for new projects. It will overwrite existing files."
+        echo ""
+        echo "  Use one of:"
+        printf "    ${CYAN}claude-ops adopt${RESET}        Integrate kit into existing setup (recommended)\n"
+        printf "    ${CYAN}claude-ops init --overwrite${RESET}  Force init, replacing existing files\n"
+        exit 1
+    fi
 fi
 
 if [[ ! -d "$TARGET_DIR/.git" ]]; then
@@ -341,6 +379,11 @@ if $OPT_RETRO; then
     cp "$OPTIONAL/retrospective/retro-template.md" "$TARGET_DIR/.claude/retrospectives/retro-template.md" 2>/dev/null || true
     info ".claude/retrospectives/retro-template.md"
 fi
+
+# ---------------------------------------------------------------------------
+# Phase 5.5: Discover unknown .claude/ files (only meaningful with --overwrite)
+# ---------------------------------------------------------------------------
+run_discovery "$KIT_ROOT" "$TARGET_DIR" "$PROJECT_NAME" "$NO_DISCOVER"
 
 # ---------------------------------------------------------------------------
 # Phase 6: Git configuration

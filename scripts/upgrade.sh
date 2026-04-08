@@ -11,8 +11,26 @@ MANIFEST="$TARGET_DIR/claude-ops.json"
 GREEN="\033[0;32m"
 YELLOW="\033[0;33m"
 CYAN="\033[0;36m"
+RED="\033[0;31m"
 BOLD="\033[1m"
+DIM="\033[2m"
 RESET="\033[0m"
+
+# Parse flags
+NO_DISCOVER=false
+for arg in "$@"; do
+    case "$arg" in
+        --no-discover) NO_DISCOVER=true ;;
+    esac
+done
+
+# Shared discovery library
+source "$KIT_ROOT/scripts/lib/discovery.sh"
+
+info()  { printf "${CYAN}→ %s${RESET}\n" "$1"; }
+ok()    { printf "${GREEN}✓ %s${RESET}\n" "$1"; }
+warn()  { printf "${YELLOW}⚠ %s${RESET}\n" "$1"; }
+header() { printf "\n${BOLD}%s${RESET}\n" "$1"; }
 
 if [[ ! -f "$MANIFEST" ]]; then
     echo "No claude-ops.json found. Run 'claude-ops init' first."
@@ -66,6 +84,10 @@ for rule_file in "$BASELINE_RULES"/*.md; do
         fi
     fi
 done
+
+# Discover unknown .claude/ files
+PROJECT_NAME=$(jq -r '.project.name // "unknown"' "$MANIFEST" 2>/dev/null || echo "unknown")
+run_discovery "$KIT_ROOT" "$TARGET_DIR" "$PROJECT_NAME" "$NO_DISCOVER"
 
 # Update manifest version
 TODAY=$(date +%Y-%m-%d)

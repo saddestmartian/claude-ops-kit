@@ -18,8 +18,12 @@ Usage:
 
 Commands:
   init          Bootstrap a new project with Claude Code workflow
+                  --overwrite     Force init even if existing Claude Code files are found
+                  --no-discover   Skip unknown file discovery
   adopt         Integrate kit into an existing project (merge, not overwrite)
+                  --no-discover   Skip unknown file discovery
   upgrade       Pull updated templates from kit into current project
+                  --no-discover   Skip unknown file discovery
   register      Register current project in the cross-project registry
   new-skill     Scaffold a new skill
   new-agent     Scaffold a new agent
