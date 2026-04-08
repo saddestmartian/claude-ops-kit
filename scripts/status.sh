@@ -84,4 +84,30 @@ done
 RULE_COUNT=$(ls -1 "$TARGET_DIR/.claude/rules/"*.md 2>/dev/null | wc -l | tr -d ' ')
 printf "    ${GREEN}✓${RESET} .claude/rules/ (%s rules)\n" "$RULE_COUNT"
 
+# Discovered (unmanaged) files
+if $HAS_JQ && [[ -f "$MANIFEST" ]]; then
+    DISCOVERED_COUNT=$(jq -r '.discovered // [] | length' "$MANIFEST" 2>/dev/null || echo "0")
+    if [[ "$DISCOVERED_COUNT" -gt 0 ]]; then
+        echo ""
+        printf "  ${BOLD}Discovered (Unmanaged):${RESET}\n"
+        for ((i = 0; i < DISCOVERED_COUNT; i++)); do
+            DPATH=$(jq -r ".discovered[$i].path" "$MANIFEST")
+            DACTION=$(jq -r ".discovered[$i].action" "$MANIFEST")
+            DISSUE=$(jq -r ".discovered[$i].issueUrl // \"\"" "$MANIFEST")
+            case "$DACTION" in
+                keep)
+                    if [[ -n "$DISSUE" ]]; then
+                        printf "    ${GREEN}✓${RESET} %s (kept — %s)\n" "$DPATH" "$DISSUE"
+                    else
+                        printf "    ${GREEN}✓${RESET} %s (kept)\n" "$DPATH"
+                    fi
+                    ;;
+                ignore)
+                    printf "    · %s (ignored)\n" "$DPATH"
+                    ;;
+            esac
+        done
+    fi
+fi
+
 echo ""

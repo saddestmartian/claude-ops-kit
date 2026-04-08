@@ -25,11 +25,16 @@ header() { printf "\n${BOLD}%s${RESET}\n" "$1"; }
 # Phase 1: Detection
 # ---------------------------------------------------------------------------
 FORCE=false
+NO_DISCOVER=false
 for arg in "$@"; do
     case "$arg" in
         --overwrite) FORCE=true ;;
+        --no-discover) NO_DISCOVER=true ;;
     esac
 done
+
+# Shared discovery library
+source "$KIT_ROOT/scripts/lib/discovery.sh"
 
 header "claude-ops init v${VERSION}"
 
@@ -374,6 +379,11 @@ if $OPT_RETRO; then
     cp "$OPTIONAL/retrospective/retro-template.md" "$TARGET_DIR/.claude/retrospectives/retro-template.md" 2>/dev/null || true
     info ".claude/retrospectives/retro-template.md"
 fi
+
+# ---------------------------------------------------------------------------
+# Phase 5.5: Discover unknown .claude/ files (only meaningful with --overwrite)
+# ---------------------------------------------------------------------------
+run_discovery "$KIT_ROOT" "$TARGET_DIR" "$PROJECT_NAME" "$NO_DISCOVER"
 
 # ---------------------------------------------------------------------------
 # Phase 6: Git configuration

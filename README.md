@@ -17,57 +17,181 @@ cd /path/to/your/project
 claude-ops init
 ```
 
-The `init` command walks you through an interactive setup:
+---
+
+## Commands
+
+### `claude-ops init`
+
+Bootstraps a **new project** from scratch with the full Claude Code workflow infrastructure.
+
+Walks you through an interactive setup:
 - Project name and task ID prefix
 - Tech stack selection (Node.js, TypeScript, Swift, Python, Luau)
 - Lint/format/test commands (auto-suggested from stack)
 - Optional modules (backlog, agents, skills, testing, etc.)
 
-> **Note:** `init` will block if it detects existing Claude Code files (CLAUDE.md, .claude/rules/, etc.) to prevent accidental overwrites. Use `claude-ops adopt` for existing projects, or `claude-ops init --overwrite` to force a fresh setup.
+**Safety guard:** Blocks if it detects existing Claude Code files (CLAUDE.md, `.claude/rules/`, etc.) to prevent accidental overwrites. Use `claude-ops adopt` for existing projects instead.
+
+| Flag | Effect |
+|------|--------|
+| `--overwrite` | Force init even if existing Claude Code files are found |
+| `--no-discover` | Skip unknown file discovery (for CI / non-interactive use) |
+
+### `claude-ops adopt`
+
+Integrates the kit into an **existing project** that already has some Claude Code setup (CLAUDE.md, rules, skills, etc.) but wasn't bootstrapped by the kit.
+
+Unlike `init` (which creates everything fresh), `adopt`:
+1. **Scans** what you already have (CLAUDE.md, `.claude/rules/`, skills, scripts, etc.)
+2. **Shows** what exists vs what the kit would add
+3. **Per-component choice**: merge (add missing pieces), skip (keep yours), or replace
+4. **Discovers unknown files** — any `.claude/` content that isn't part of the kit is surfaced for you to remove, keep (with upstream issue filed), or ignore
+5. **Never overwrites** without asking — existing rules and skills are preserved
+6. **Generates** `claude-ops.json` so `upgrade` works going forward
+
+If your CLAUDE.md is missing key sections (investigation-first, anti-spiral, etc.), adopt writes a `CLAUDE.md.kit-reference` alongside your existing file for manual merge.
+
+| Flag | Effect |
+|------|--------|
+| `--no-discover` | Skip unknown file discovery |
+
+### `claude-ops upgrade`
+
+Pulls updated templates from the kit into a project that's already managed by claude-ops.
+
+- Compares your project's `claude-ops.json` version against the kit
+- Adds new baseline rules that were introduced since your last upgrade
+- Skips rules you've customized (detects user modifications)
+- Discovers any new unknown `.claude/` files since the last run
+- Updates the manifest version
+
+| Flag | Effect |
+|------|--------|
+| `--no-discover` | Skip unknown file discovery |
+
+### Other Commands
+
+| Command | Description |
+|---------|-------------|
+| `claude-ops register` | Register current project in the cross-project registry |
+| `claude-ops new-skill` | Scaffold a new skill in `.claude/skills/` |
+| `claude-ops new-agent` | Scaffold a new agent in `.claude/agents/` |
+| `claude-ops new-rule` | Scaffold a new rule in `.claude/rules/` |
+| `claude-ops status` | Show kit version, project health, and discovered files |
+| `claude-ops retro` | Generate a dated retrospective template |
+| `claude-ops version` | Show kit version |
+
+---
 
 ## What Gets Created
 
-### Always Included (Baseline)
+### Baseline (Always Included)
+
+Every `init` or `adopt` run installs these foundational files:
+
+#### Root Files
 | File | Purpose |
 |------|---------|
-| `CLAUDE.md` | Root instructions — workflow rules, session start, critical guardrails |
-| `PROJECT_STATE.md` | Session context — what's done, in progress, next up |
+| `CLAUDE.md` | Root instructions — workflow rules, session start checklist, critical guardrails |
+| `PROJECT_STATE.md` | Session context — current status, what's done, in progress, next up |
 | `REFERENCE_MAP.md` | Module inventory with line counts and roles |
-| `.claude/rules/` | 7 auto-loaded behavioral guardrails |
-| `.claude/setup/` | Per-platform setup checklists (macOS, Windows, Cloud) |
-| `.claude/skills/handoff/` | Session handoff procedure |
+| `claude-ops.json` | Kit manifest for version tracking and upgrade support |
+
+#### Rules (`.claude/rules/`)
+
+Auto-loaded behavioral guardrails — Claude Code reads these every session:
+
+| Rule | File | Purpose |
+|------|------|---------|
+| Investigation-First | `investigation-first.md` | Read before edit. Trace the execution path. |
+| Anti-Spiral | `anti-spiral.md` | Prevent fix-on-fix loops. Three whiffs = stop. |
+| Git Safety | `git-safety.md` | Never silently resolve conflicts or discard changes. |
+| Phase Gates | `phase-gates.md` | Report at checkpoints for multi-file changes. |
+| Confidence Flagging | `confidence-flagging.md` | Mark API assumptions as VERIFIED / ASSUMED / UNVERIFIED. |
+| Code Discipline | `code-discipline.md` | Surgical edits, 60-line limit, read before write. |
+| Milestone Reporting | `milestone-reporting.md` | Report at natural milestones, not arbitrary intervals. |
+| Workflow Feedback | `workflow-feedback.md` | Empty accumulator for project-specific learned rules. |
+
+#### Skills (`.claude/skills/`)
+| Skill | Path | Purpose |
+|-------|------|---------|
+| Handoff | `skills/handoff/SKILL.md` | Session handoff procedure — capture state for next session |
+
+#### Setup & Infrastructure
+| File | Purpose |
+|------|---------|
+| `.claude/setup/macos.md` | macOS platform setup checklist |
+| `.claude/setup/windows.md` | Windows platform setup checklist |
+| `.claude/setup/cloud.md` | Cloud environment setup checklist |
 | `.claude/MEMORY.md` | Memory index for cross-session persistence |
-| `.githooks/pre-commit` | Format + lint gates |
-| `scripts/sync-memory.sh` | Cross-machine memory sync |
-| `scripts/verify-sync.sh` | Drift detection diagnostic |
-| `claude-ops.json` | Kit manifest for version tracking |
+| `.claude/memory-sync/` | Directory for git-tracked memory backup |
+| `.githooks/pre-commit` | Format + lint gates (auto-configured via `core.hooksPath`) |
+| `scripts/sync-memory.sh` | Cross-machine memory sync script |
+| `scripts/verify-sync.sh` | Memory drift detection diagnostic |
 
 ### Optional Modules
-| Module | Description |
-|--------|-------------|
-| Backlog system | JSON task registry + HTML kanban viewer |
-| Domain model | Lightweight DDD bounded contexts |
-| Architecture validator | Agent that checks dead code, drift, test gaps |
-| Design advisor | Agent for UX/design consultation |
-| Code reviewer | Agent for PR-level code review |
-| PR skill | Pre-validation (lint, test, sync) before PR creation |
-| Video toolkit | FFmpeg + Whisper video analysis |
-| Testing framework | Decision tree + coverage enforcement |
-| Dependency graph | Import/require graph generator |
-| Codebase audit | Parallel sub-agent audit protocol |
-| Retrospectives | Session retrospective template |
 
-## The 7 Baseline Rules
+Selected during `init` or detected during `adopt`:
 
-These auto-load in every Claude Code session:
+#### Agents (`.claude/agents/`)
+| Agent | Path | Purpose |
+|-------|------|---------|
+| Architecture Validator | `agents/architecture-validator/` | Dead code detection, REFERENCE_MAP alignment, test coverage gaps, dependency health |
+| Design Advisor | `agents/design-advisor/` | UX/design consultation for layout, color, accessibility |
+| Code Reviewer | `agents/code-reviewer/` | PR-level code review — correctness, security, style, tests |
 
-1. **Investigation-First** — Read before edit. Trace the execution path.
-2. **Anti-Spiral** — Prevent fix-on-fix loops. Three whiffs = stop.
-3. **Git Safety** — Never silently resolve conflicts or discard changes.
-4. **Phase Gates** — Report at checkpoints for multi-file changes.
-5. **Confidence Flagging** — Mark API assumptions as VERIFIED/ASSUMED/UNVERIFIED.
-6. **Code Discipline** — Surgical edits, 60-line limit, read before write.
-7. **Milestone Reporting** — Report at natural milestones, not arbitrary intervals.
+#### Skills (`.claude/skills/`)
+| Skill | Path | Purpose |
+|-------|------|---------|
+| PR | `skills/pr/` | Pre-validation (lint, test, sync) before PR creation |
+| Video Toolkit | `skills/video-toolkit/` | FFmpeg + Whisper video analysis |
+
+#### Rules (`.claude/rules/`)
+| Rule | File | Purpose |
+|------|------|---------|
+| Testing Framework | `testing-requirements.md` | Decision tree for when tests are required + coverage enforcement |
+| Codebase Audit | `audit-protocol.md` | Parallel sub-agent audit protocol |
+
+#### Project Files
+| Module | File | Purpose |
+|--------|------|---------|
+| Backlog System | `backlog.json` + `backlog-viewer.html` | JSON task registry with HTML kanban viewer |
+| Domain Model | `DOMAINS.md` | Lightweight DDD bounded contexts |
+| Retrospectives | `.claude/retrospectives/retro-template.md` | Session retrospective template |
+
+---
+
+## Unknown File Discovery
+
+All three commands (`init --overwrite`, `adopt`, `upgrade`) scan `.claude/` for files that aren't part of the kit. This catches custom rules, skills, agents, or other artifacts you've created independently.
+
+For each unknown file, you choose:
+- **Remove** — Delete the file
+- **Keep** — Preserve it, catalogue it in `claude-ops.json`, and file a GitHub issue on the kit repo suggesting it for inclusion
+- **Ignore** — Acknowledge it exists, catalogue it, no upstream action
+
+Previously catalogued items (keep/ignore) are not re-prompted on subsequent runs. Removed items are re-prompted if the file reappears.
+
+Claude Code native files (`.claude/settings.json`, `.claude/settings.local.json`, `.claude/worktrees/`) are silently skipped — they're managed by Claude Code itself.
+
+Use `--no-discover` on any command to skip discovery entirely.
+
+---
+
+## Stack Presets
+
+Pre-configured lint/format commands and language-specific convention rules:
+
+| Stack | Lint | Format | Convention Rules |
+|-------|------|--------|-----------------|
+| Node.js | `npx eslint .` | `npx prettier --check .` | npm safety, async patterns |
+| TypeScript | `npx eslint .` | `npx prettier --check .` | strict mode, type safety |
+| Swift | `swiftlint` | `swiftformat --lint .` | SwiftUI patterns, concurrency |
+| Python | `ruff check .` | `ruff format --check .` | venv, type hints, pathlib |
+| Luau | `selene src/` | `stylua --check src/` | Roblox API safety, Studio limitations |
+
+---
 
 ## Cross-Project Registry
 
@@ -93,45 +217,6 @@ The `playbook/` directory contains narrative documentation of workflow patterns:
 - **Model Routing** — When to use Opus vs Sonnet
 - **Sub-Agent Orchestration** — Parallel worktree agent patterns
 - **Trust Erosion Patterns** — Actions that break user trust
-
-## Stack Presets
-
-Pre-configured lint/format commands and language-specific rules:
-
-| Stack | Lint | Format | Convention Rules |
-|-------|------|--------|-----------------|
-| Node.js | `npx eslint .` | `npx prettier --check .` | npm safety, async patterns |
-| TypeScript | `npx eslint .` | `npx prettier --check .` | strict mode, type safety |
-| Swift | `swiftlint` | `swiftformat --lint .` | SwiftUI patterns, concurrency |
-| Python | `ruff check .` | `ruff format --check .` | venv, type hints, pathlib |
-| Luau | `selene src/` | `stylua --check src/` | Roblox API safety, Studio limitations |
-
-## Adopting an Existing Project
-
-For projects that already have some Claude Code setup (CLAUDE.md, rules, etc.) but weren't bootstrapped by the kit:
-
-```bash
-cd /path/to/existing/project
-claude-ops adopt
-```
-
-Unlike `init` (which creates everything fresh), `adopt`:
-1. **Scans** what you already have (CLAUDE.md, .claude/rules/, skills, scripts, etc.)
-2. **Shows** what exists vs what the kit would add
-3. **Per-component choice**: merge (add missing pieces), skip (keep yours), or replace
-4. **Never overwrites** without asking — existing rules and skills are preserved
-5. **Generates** `claude-ops.json` so `upgrade` works going forward
-
-If your CLAUDE.md is missing key sections (investigation-first, anti-spiral, etc.), adopt writes a `CLAUDE.md.kit-reference` alongside your existing file for manual merge.
-
-## Upgrading
-
-```bash
-cd /path/to/your/project
-claude-ops upgrade
-```
-
-Compares your project's `claude-ops.json` version against the kit, applies template updates that you haven't customized, and flags conflicts for manual resolution.
 
 ## Multi-Platform Support
 

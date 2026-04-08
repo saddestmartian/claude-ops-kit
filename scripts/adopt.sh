@@ -25,6 +25,17 @@ warn()   { printf "${YELLOW}⚠ %s${RESET}\n" "$1"; }
 skip()   { printf "${DIM}  · %s${RESET}\n" "$1"; }
 header() { printf "\n${BOLD}%s${RESET}\n" "$1"; }
 
+# Parse flags
+NO_DISCOVER=false
+for arg in "$@"; do
+    case "$arg" in
+        --no-discover) NO_DISCOVER=true ;;
+    esac
+done
+
+# Shared discovery library
+source "$KIT_ROOT/scripts/lib/discovery.sh"
+
 # ---------------------------------------------------------------------------
 # Phase 1: Pre-flight checks
 # ---------------------------------------------------------------------------
@@ -366,6 +377,11 @@ if [[ ! -f "$TARGET_DIR/.claude/rules/workflow-feedback.md" ]]; then
 RULE
     ok "  .claude/rules/workflow-feedback.md (empty accumulator added)"
 fi
+
+# ---------------------------------------------------------------------------
+# Phase 4.5: Discover unknown .claude/ files
+# ---------------------------------------------------------------------------
+run_discovery "$KIT_ROOT" "$TARGET_DIR" "$PROJECT_NAME" "$NO_DISCOVER"
 
 # ---------------------------------------------------------------------------
 # Phase 5: Git configuration
