@@ -23,6 +23,8 @@ The `init` command walks you through an interactive setup:
 - Lint/format/test commands (auto-suggested from stack)
 - Optional modules (backlog, agents, skills, testing, etc.)
 
+> **Note:** `init` will block if it detects existing Claude Code files (CLAUDE.md, .claude/rules/, etc.) to prevent accidental overwrites. Use `claude-ops adopt` for existing projects, or `claude-ops init --overwrite` to force a fresh setup.
+
 ## What Gets Created
 
 ### Always Included (Baseline)

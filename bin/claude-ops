@@ -18,6 +18,7 @@ Usage:
 
 Commands:
   init          Bootstrap a new project with Claude Code workflow
+                  --overwrite   Force init even if existing Claude Code files are found
   adopt         Integrate kit into an existing project (merge, not overwrite)
   upgrade       Pull updated templates from kit into current project
   register      Register current project in the cross-project registry
