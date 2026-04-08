@@ -1,0 +1,62 @@
+# Video Toolkit Skill
+
+Analyze, extract, and process video files using FFmpeg and Whisper-based transcription.
+
+## When to Use
+When a video file is shared (.mov, .mp4, .avi, etc.) or you encounter "cannot read binary files" on a video.
+
+## Workflow (Follow This Order)
+
+### 1. Extract and Transcribe Audio FIRST
+The narration is the primary content. Audio tells you what the video is about before you look at any frames.
+- Use `scripts/extract_audio.py` to pull the audio track
+- Use `scripts/transcribe_audio.py` for speech-to-text
+- Never skip this step — a 5-minute video of the same screen with narration is a walkthrough, not a static screenshot
+
+### 2. Extract Key Frames
+- Use `scripts/extract_frames.py` for frame extraction
+- For screen recordings: use 2-3 second intervals
+- Correlate frames with transcript timestamps
+
+### 3. Analyze Frames in Context
+- **Mouse cursor position** is the visual signal in screen recordings — track it across frames to understand what the narrator is pointing at
+- Never conclude "it's all the same image" without checking audio first
+- Cross-reference visual changes with narration timestamps
+
+### 4. Advanced Analysis (Optional)
+- `scripts/analyze_video.sh` — combined extraction + analysis pipeline
+- `scripts/analyze_audio_gemini.py` — Gemini-based audio analysis for complex narration
+- `scripts/identify_music.py` — identify background music or audio sources
+- `scripts/edit_video.py` — programmatic video editing (trim, concat, overlay)
+
+## Setup (Per Machine)
+The skill's Python scripts are git-tracked. The virtual environment and API keys are machine-local:
+
+```bash
+# 1. Install dependencies (creates .venv/)
+bash {{SOURCE_DIR}}scripts/install_dependencies.sh
+
+# 2. Configure API keys (Gemini, etc.)
+python scripts/setup_api_keys.py
+```
+
+The `.venv/` directory is not tracked — recreate it on each machine via the install script.
+
+## Scripts Reference
+| Script | Purpose |
+|--------|---------|
+| `extract_audio.py` | Pull audio track from video |
+| `transcribe_audio.py` | Whisper speech-to-text |
+| `extract_frames.py` | Extract frames at intervals |
+| `analyze_video.sh` | Combined extraction + analysis |
+| `analyze_audio_gemini.py` | Gemini-based audio analysis |
+| `identify_music.py` | Background music identification |
+| `edit_video.py` | Programmatic video editing |
+| `install_dependencies.sh` | Create .venv/ with all deps |
+| `setup_api_keys.py` | Configure API credentials |
+
+## Rules
+- Always read THIS skill file before handling any video — do not improvise with raw ffmpeg
+- Audio first, frames second — narration is the primary content source
+- Track cursor position across frames for screen recordings
+- Never conclude visual content is static without checking audio

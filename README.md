@@ -112,6 +112,7 @@ Auto-loaded behavioral guardrails — Claude Code reads these every session:
 | Code Discipline | `code-discipline.md` | Surgical edits, 60-line limit, read before write. |
 | Milestone Reporting | `milestone-reporting.md` | Report at natural milestones, not arbitrary intervals. |
 | Workflow Feedback | `workflow-feedback.md` | Empty accumulator for project-specific learned rules. |
+| Known Traps | `known-traps.md` | Empty accumulator for platform/framework-specific gotchas. |
 
 #### Skills (`.claude/skills/`)
 | Skill | Path | Purpose |
@@ -139,18 +140,20 @@ Selected during `init` or detected during `adopt`:
 |-------|------|---------|
 | Architecture Validator | `agents/architecture-validator/` | Dead code detection, REFERENCE_MAP alignment, test coverage gaps, dependency health |
 | Design Advisor | `agents/design-advisor/` | UX/design consultation for layout, color, accessibility |
+| Design Auditor | `agents/design-auditor/` | Compliance scanner — audits code against design system tokens, responsive rules, CTA hierarchy |
 | Code Reviewer | `agents/code-reviewer/` | PR-level code review — correctness, security, style, tests |
 
 #### Skills (`.claude/skills/`)
 | Skill | Path | Purpose |
 |-------|------|---------|
 | PR | `skills/pr/` | Pre-validation (lint, test, sync) before PR creation |
-| Video Toolkit | `skills/video-toolkit/` | FFmpeg + Whisper video analysis |
+| Video Toolkit | `skills/video-toolkit/` | FFmpeg + Whisper video analysis (audio-first workflow, frame extraction, cursor tracking) |
 
 #### Rules (`.claude/rules/`)
 | Rule | File | Purpose |
 |------|------|---------|
 | Testing Framework | `testing-requirements.md` | Decision tree for when tests are required + coverage enforcement |
+| Pre-Implementation Checklist | `pre-implementation-checklist.md` | Read-before-write gate — read targets, trace deps, confirm approach |
 | Codebase Audit | `audit-protocol.md` | Parallel sub-agent audit protocol |
 
 #### Project Files
