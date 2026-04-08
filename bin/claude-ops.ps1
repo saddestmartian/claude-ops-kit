@@ -1,8 +1,9 @@
 # claude-ops.ps1 — PowerShell wrapper for Windows
 # Delegates to the bash script via Git Bash
 
-$KitRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
-$BashScript = Join-Path $KitRoot "bin" "claude-ops"
+# KIT_ROOT is baked in by install.sh on Windows; falls back to script-relative resolution
+$KitRoot = if ($env:CLAUDE_OPS_KIT_ROOT) { $env:CLAUDE_OPS_KIT_ROOT } else { Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path) }
+$BashScript = Join-Path (Join-Path $KitRoot "bin") "claude-ops"
 
 # Find Git Bash
 $GitBash = $null
@@ -27,4 +28,5 @@ if (-not $GitBash) {
 # Convert Windows path to Unix-style for bash
 $UnixScript = $BashScript -replace '\\', '/' -replace '^([A-Z]):', '/$1'
 
-& $GitBash -c "$UnixScript $($args -join ' ')"
+# Use --login to get proper PATH, and let stdin pass through for interactive prompts
+& $GitBash --login -c "$UnixScript $($args -join ' ')"

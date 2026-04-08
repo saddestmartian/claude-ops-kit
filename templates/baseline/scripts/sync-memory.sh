@@ -14,6 +14,11 @@
 
 set -euo pipefail
 
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+    echo "Error: not inside a git repository. Run this from your project directory."
+    exit 1
+fi
+
 REPO_ROOT=$(git rev-parse --show-toplevel)
 SYNC_DIR="$REPO_ROOT/.claude/memory-sync"
 MANIFEST="$SYNC_DIR/.sync-manifest"
