@@ -264,7 +264,7 @@ info ".claude/MEMORY.md"
 
 # Rules (copy verbatim — no template variables)
 cp "$BASELINE/claude/rules/"*.md "$TARGET_DIR/.claude/rules/"
-info ".claude/rules/ (7 baseline rules)"
+info ".claude/rules/ (8 baseline rules)"
 
 # Stack-specific rules
 STACK_DIR="$KIT_ROOT/templates/stack-presets"

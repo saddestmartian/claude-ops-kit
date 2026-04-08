@@ -41,6 +41,12 @@
       "source": "baseline",
       "description": "Report progress at natural milestones",
       "usedBy": ["ugc-world"]
+    },
+    {
+      "name": "known-traps",
+      "source": "baseline",
+      "description": "Empty accumulator for platform/framework-specific gotchas",
+      "usedBy": []
     }
   ]
 }
