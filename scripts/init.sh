@@ -182,10 +182,12 @@ OPT_BACKLOG=false
 OPT_DOMAINS=false
 OPT_ARCH_VALIDATOR=false
 OPT_DESIGN_ADVISOR=false
+OPT_DESIGN_AUDITOR=false
 OPT_CODE_REVIEWER=false
 OPT_PR_SKILL=false
 OPT_VIDEO_TOOLKIT=false
 OPT_TESTING=false
+OPT_PRE_IMPL_CHECK=false
 OPT_DEP_GRAPH=false
 OPT_AUDIT=false
 OPT_RETRO=false
@@ -194,10 +196,12 @@ ask_module "Backlog system (JSON + kanban viewer)" && OPT_BACKLOG=true
 ask_module "Domain model (DDD bounded contexts)" && OPT_DOMAINS=true
 ask_module "Architecture validator agent" && OPT_ARCH_VALIDATOR=true
 ask_module "Design advisor agent" && OPT_DESIGN_ADVISOR=true
+ask_module "Design auditor agent (compliance scanner)" && OPT_DESIGN_AUDITOR=true
 ask_module "Code reviewer agent" && OPT_CODE_REVIEWER=true
 ask_module "PR skill (lint/test gates before PR)" && OPT_PR_SKILL=true
 ask_module "Video toolkit (FFmpeg + Whisper)" && OPT_VIDEO_TOOLKIT=true
 ask_module "Testing framework (decision tree + coverage)" && OPT_TESTING=true
+ask_module "Pre-implementation checklist (read-before-write gate)" && OPT_PRE_IMPL_CHECK=true
 ask_module "Dependency graph generator" && OPT_DEP_GRAPH=true
 ask_module "Codebase audit protocol" && OPT_AUDIT=true
 ask_module "Retrospective template" && OPT_RETRO=true
@@ -302,6 +306,10 @@ cat > "$TARGET_DIR/.claude/rules/workflow-feedback.md" <<'RULE'
 RULE
 info ".claude/rules/workflow-feedback.md (empty accumulator)"
 
+# Known-traps accumulator
+cp "$BASELINE/claude/rules/known-traps.md" "$TARGET_DIR/.claude/rules/known-traps.md"
+info ".claude/rules/known-traps.md (empty accumulator)"
+
 # ---------------------------------------------------------------------------
 # Phase 5: Optional modules
 # ---------------------------------------------------------------------------
@@ -339,6 +347,15 @@ if $OPT_DESIGN_ADVISOR; then
     info ".claude/agents/design-advisor/"
 fi
 
+if $OPT_DESIGN_AUDITOR; then
+    mkdir -p "$TARGET_DIR/.claude/agents/design-auditor"
+    render_template "$OPTIONAL/agents/design-auditor/CLAUDE.md.tmpl" \
+        "$TARGET_DIR/.claude/agents/design-auditor/CLAUDE.md" 2>/dev/null || \
+        cp "$OPTIONAL/agents/design-auditor/CLAUDE.md.tmpl" \
+           "$TARGET_DIR/.claude/agents/design-auditor/CLAUDE.md"
+    info ".claude/agents/design-auditor/"
+fi
+
 if $OPT_CODE_REVIEWER; then
     mkdir -p "$TARGET_DIR/.claude/agents/code-reviewer"
     render_template "$OPTIONAL/agents/code-reviewer/CLAUDE.md.tmpl" \
@@ -357,7 +374,11 @@ if $OPT_PR_SKILL; then
 fi
 
 if $OPT_VIDEO_TOOLKIT; then
-    cp -r "$OPTIONAL/skills/video-toolkit" "$TARGET_DIR/.claude/skills/" 2>/dev/null || true
+    mkdir -p "$TARGET_DIR/.claude/skills/video-toolkit/scripts"
+    render_template "$OPTIONAL/skills/video-toolkit/SKILL.md.tmpl" \
+        "$TARGET_DIR/.claude/skills/video-toolkit/SKILL.md" 2>/dev/null || \
+        cp "$OPTIONAL/skills/video-toolkit/SKILL.md.tmpl" "$TARGET_DIR/.claude/skills/video-toolkit/SKILL.md"
+    cp -r "$OPTIONAL/skills/video-toolkit/scripts/"* "$TARGET_DIR/.claude/skills/video-toolkit/scripts/" 2>/dev/null || true
     info ".claude/skills/video-toolkit/"
 fi
 
@@ -367,6 +388,11 @@ if $OPT_TESTING; then
         cp "$OPTIONAL/testing/testing-requirements.md.tmpl" \
            "$TARGET_DIR/.claude/rules/testing-requirements.md"
     info ".claude/rules/testing-requirements.md"
+fi
+
+if $OPT_PRE_IMPL_CHECK; then
+    cp "$OPTIONAL/testing/pre-implementation-checklist.md" "$TARGET_DIR/.claude/rules/pre-implementation-checklist.md" 2>/dev/null || true
+    info ".claude/rules/pre-implementation-checklist.md"
 fi
 
 if $OPT_AUDIT; then
@@ -415,6 +441,7 @@ AGENTS_JSON="[]"
 SKILLS_JSON='["handoff"]'
 [[ $OPT_ARCH_VALIDATOR == true ]] && AGENTS_JSON=$(echo "$AGENTS_JSON" | sed 's/\]/,"architecture-validator"]/' | sed 's/\[,/[/')
 [[ $OPT_DESIGN_ADVISOR == true ]] && AGENTS_JSON=$(echo "$AGENTS_JSON" | sed 's/\]/,"design-advisor"]/' | sed 's/\[,/[/')
+[[ $OPT_DESIGN_AUDITOR == true ]] && AGENTS_JSON=$(echo "$AGENTS_JSON" | sed 's/\]/,"design-auditor"]/' | sed 's/\[,/[/')
 [[ $OPT_CODE_REVIEWER == true ]] && AGENTS_JSON=$(echo "$AGENTS_JSON" | sed 's/\]/,"code-reviewer"]/' | sed 's/\[,/[/')
 [[ $OPT_PR_SKILL == true ]] && SKILLS_JSON=$(echo "$SKILLS_JSON" | sed 's/\]/,"pr"]/')
 [[ $OPT_VIDEO_TOOLKIT == true ]] && SKILLS_JSON=$(echo "$SKILLS_JSON" | sed 's/\]/,"video-toolkit"]/')
