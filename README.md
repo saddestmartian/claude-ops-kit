@@ -60,11 +60,12 @@ If your CLAUDE.md is missing key sections (investigation-first, anti-spiral, etc
 
 Pulls updated templates from the kit into a project that's already managed by claude-ops.
 
-- Compares your project's `claude-ops.json` version against the kit
+- Compares your project's `claude-ops.json` version against the kit's `VERSION` file
 - Adds new baseline rules that were introduced since your last upgrade
 - Skips rules you've customized (detects user modifications)
+- Updates `check-version.sh` to the latest and ensures the SessionStart hook is configured
 - Discovers any new unknown `.claude/` files since the last run
-- Updates the manifest version
+- Updates the manifest version and `kitPath`
 
 | Flag | Effect |
 |------|--------|
@@ -130,6 +131,8 @@ Auto-loaded behavioral guardrails — Claude Code reads these every session:
 | `.githooks/pre-commit` | Format + lint gates (auto-configured via `core.hooksPath`) |
 | `scripts/sync-memory.sh` | Cross-machine memory sync script |
 | `scripts/verify-sync.sh` | Memory drift detection diagnostic |
+| `scripts/check-version.sh` | Session-start kit version check |
+| `.claude/settings.json` | Claude Code hooks (SessionStart version check) |
 
 ### Optional Modules
 
@@ -179,6 +182,31 @@ Previously catalogued items (keep/ignore) are not re-prompted on subsequent runs
 Claude Code native files (`.claude/settings.json`, `.claude/settings.local.json`, `.claude/worktrees/`) are silently skipped — they're managed by Claude Code itself.
 
 Use `--no-discover` on any command to skip discovery entirely.
+
+---
+
+## Automatic Version Check
+
+When you start a Claude Code session in a kit-managed project, a SessionStart hook runs `scripts/check-version.sh`. If your project's kit version is behind the installed kit, you'll see:
+
+```
+⚠ claude-ops-kit update available: 1.0.0 → 1.1.0
+
+Changes since 1.0.0:
+## [1.1.0] - 2026-04-08
+### Added
+- known-traps.md baseline rule...
+[changelog entries]
+
+Run 'claude-ops upgrade' to update.
+```
+
+The check resolves the kit version via:
+1. `kitPath` stored in `claude-ops.json` (set during init/adopt/upgrade)
+2. Fallback: `claude-ops` on PATH (follows symlink to kit root)
+3. Fallback: GitHub API via `gh` (for remote-only workflows)
+
+If none resolve, the check exits silently — no noise, no errors.
 
 ---
 

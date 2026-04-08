@@ -4,10 +4,11 @@
 
 set -euo pipefail
 
-VERSION="1.0.0"
-
 # Resolve kit root (where this script lives → parent)
 KIT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Read version from single source of truth
+VERSION="$(cat "$KIT_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
 
 usage() {
     cat <<EOF

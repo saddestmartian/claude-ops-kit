@@ -30,6 +30,8 @@ These five rules address the most common failure modes. They are summarized here
 
 Run the relevant platform checklist on first session per machine. The steps below are universal:
 
+> **Automatic checks:** The SessionStart hook runs `scripts/check-version.sh` automatically. If a kit update is available, you'll see the changelog diff and a prompt to run `claude-ops upgrade`.
+
 1. **Import memory:** Run `scripts/sync-memory.sh import` — restores project context from git-tracked backup.
 2. Read `PROJECT_STATE.md` for current progress, active work, and blockers
 3. Run `git log --oneline -10` to see recent commits
