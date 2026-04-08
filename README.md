@@ -104,6 +104,24 @@ Pre-configured lint/format commands and language-specific rules:
 | Python | `ruff check .` | `ruff format --check .` | venv, type hints, pathlib |
 | Luau | `selene src/` | `stylua --check src/` | Roblox API safety, Studio limitations |
 
+## Adopting an Existing Project
+
+For projects that already have some Claude Code setup (CLAUDE.md, rules, etc.) but weren't bootstrapped by the kit:
+
+```bash
+cd /path/to/existing/project
+claude-ops adopt
+```
+
+Unlike `init` (which creates everything fresh), `adopt`:
+1. **Scans** what you already have (CLAUDE.md, .claude/rules/, skills, scripts, etc.)
+2. **Shows** what exists vs what the kit would add
+3. **Per-component choice**: merge (add missing pieces), skip (keep yours), or replace
+4. **Never overwrites** without asking — existing rules and skills are preserved
+5. **Generates** `claude-ops.json` so `upgrade` works going forward
+
+If your CLAUDE.md is missing key sections (investigation-first, anti-spiral, etc.), adopt writes a `CLAUDE.md.kit-reference` alongside your existing file for manual merge.
+
 ## Upgrading
 
 ```bash
