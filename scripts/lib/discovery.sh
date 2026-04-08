@@ -177,7 +177,7 @@ discover_unknown_files() {
         fi
     done
 
-    return ${#UNKNOWN_ITEMS[@]}
+    return 0
 }
 
 # ---------------------------------------------------------------------------
