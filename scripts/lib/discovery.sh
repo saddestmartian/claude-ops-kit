@@ -23,6 +23,7 @@ build_known_paths() {
         ".claude"
         ".claude/MEMORY.md"
         ".claude/memory-sync"
+        ".claude/memory-sync/.sync-manifest"
         ".claude/rules"
         ".claude/rules/anti-spiral.md"
         ".claude/rules/code-discipline.md"
