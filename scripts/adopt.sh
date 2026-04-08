@@ -379,8 +379,8 @@ SETTINGS_FILE="$TARGET_DIR/.claude/settings.json"
 HOOK_CMD="bash scripts/check-version.sh"
 if [[ -f "$SETTINGS_FILE" ]] && command -v jq &>/dev/null; then
     # Check if hook already exists
-    if ! jq -e ".hooks.SessionStart[]? | select(.command == \"$HOOK_CMD\")" "$SETTINGS_FILE" &>/dev/null; then
-        jq --arg cmd "$HOOK_CMD" '.hooks = (.hooks // {}) | .hooks.SessionStart = ((.hooks.SessionStart // []) + [{"command": $cmd, "timeout": 5000}])' \
+    if ! jq -e ".hooks.SessionStart[]?.hooks[]? | select(.command == \"$HOOK_CMD\")" "$SETTINGS_FILE" &>/dev/null; then
+        jq --arg cmd "$HOOK_CMD" '.hooks = (.hooks // {}) | .hooks.SessionStart = ((.hooks.SessionStart // []) + [{"matcher": "", "hooks": [{"type": "command", "command": $cmd, "timeout": 5000}]}])' \
             "$SETTINGS_FILE" > "${SETTINGS_FILE}.tmp" && mv "${SETTINGS_FILE}.tmp" "$SETTINGS_FILE"
         ok "  .claude/settings.json (version check hook added)"
     else
@@ -392,8 +392,14 @@ elif [[ ! -f "$SETTINGS_FILE" ]]; then
   "hooks": {
     "SessionStart": [
       {
-        "command": "bash scripts/check-version.sh",
-        "timeout": 5000
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/check-version.sh",
+            "timeout": 5000
+          }
+        ]
       }
     ]
   }

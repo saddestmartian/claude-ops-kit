@@ -304,8 +304,14 @@ cat > "$TARGET_DIR/.claude/settings.json" <<'SETTINGSJSON'
   "hooks": {
     "SessionStart": [
       {
-        "command": "bash scripts/check-version.sh",
-        "timeout": 5000
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/check-version.sh",
+            "timeout": 5000
+          }
+        ]
       }
     ]
   }
