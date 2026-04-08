@@ -1,0 +1,88 @@
+#!/bin/bash
+set -e
+
+# verify-sync.sh — Read-only diagnostic for project consistency
+# Checks REFERENCE_MAP.md, backlog.json, and PROJECT_STATE.md for drift.
+# Always exits 0 (diagnostic, not a gate).
+
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+RESET="\033[0m"
+
+pass() { printf "${GREEN}  ✓ %s${RESET}\n" "$1"; }
+warn() { printf "${YELLOW}  ⚠ %s${RESET}\n" "$1"; }
+
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REF_MAP="$REPO_ROOT/REFERENCE_MAP.md"
+BACKLOG="$REPO_ROOT/backlog.json"
+PROJECT_STATE="$REPO_ROOT/PROJECT_STATE.md"
+MEMORY="$REPO_ROOT/.claude/MEMORY.md"
+
+HAS_JQ=true
+if ! command -v jq &>/dev/null; then
+    HAS_JQ=false
+fi
+
+# --------------------------------------------------------------------------
+echo ""
+echo "=== 1. Source file count vs REFERENCE_MAP.md ==="
+
+if [[ ! -f "$REF_MAP" ]]; then
+    warn "REFERENCE_MAP.md not found — skipping"
+else
+    src_count=$(find "$REPO_ROOT/{{SOURCE_DIR}}" -name '*{{FILE_EXTENSION}}' -type f 2>/dev/null | wc -l | tr -d ' ')
+    ref_count=$(grep -E '^\|' "$REF_MAP" \
+        | grep -v -E '^\|[-\s]+\|' \
+        | grep -v -E '^\| Module' \
+        | grep -v -E '\*\*' \
+        | wc -l | tr -d ' ')
+
+    echo "  Source files:             $src_count"
+    echo "  REFERENCE_MAP.md rows:    $ref_count"
+
+    if [[ "$src_count" -eq "$ref_count" ]]; then
+        pass "Counts match"
+    else
+        warn "Counts differ by $((src_count - ref_count)) (source - map)"
+    fi
+fi
+
+# --------------------------------------------------------------------------
+echo ""
+echo "=== 2. In-progress tasks missing from PROJECT_STATE.md ==="
+
+if [[ "$HAS_JQ" != "true" ]]; then
+    warn "jq not installed — skipping backlog checks"
+elif [[ ! -f "$BACKLOG" ]]; then
+    warn "backlog.json not found — skipping"
+elif [[ ! -f "$PROJECT_STATE" ]]; then
+    warn "PROJECT_STATE.md not found — skipping"
+else
+    missing=0
+    while IFS= read -r task_id; do
+        if ! grep -q "$task_id" "$PROJECT_STATE"; then
+            warn "In-progress task $task_id not mentioned in PROJECT_STATE.md"
+            missing=$((missing + 1))
+        fi
+    done < <(jq -r '.tasks[] | select(.status == "In progress") | .id' "$BACKLOG")
+
+    if [[ "$missing" -eq 0 ]]; then
+        pass "All in-progress tasks appear in PROJECT_STATE.md"
+    fi
+fi
+
+# --------------------------------------------------------------------------
+echo ""
+echo "=== 3. Next available {{TASK_PREFIX}}-### ID ==="
+
+if [[ "$HAS_JQ" != "true" ]]; then
+    warn "jq not installed — skipping"
+elif [[ ! -f "$BACKLOG" ]]; then
+    warn "backlog.json not found — skipping"
+else
+    next_id=$(jq '[.tasks[].id | ltrimstr("{{TASK_PREFIX}}-") | tonumber] | max + 1' "$BACKLOG")
+    pass "Next available ID: {{TASK_PREFIX}}-$next_id"
+fi
+
+echo ""
+exit 0

@@ -1,0 +1,5 @@
+{
+  "lint": "npx eslint .",
+  "format": "npx prettier --check .",
+  "test": "npx tsc --noEmit && npm test"
+}

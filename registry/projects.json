@@ -1,0 +1,140 @@
+{
+  "projects": [
+    {
+      "name": "ugc-world",
+      "repo": "saddestmartian/ugc-world",
+      "stack": ["luau"],
+      "kitVersion": "1.0.0",
+      "lastSync": "2026-04-08",
+      "maturity": "gold-standard",
+      "sessions": 82,
+      "features": {
+        "backlog": true,
+        "domains": true,
+        "agents": ["architecture-validator", "design-advisor", "design-auditor"],
+        "skills": ["handoff", "pr", "design-system", "video-toolkit"],
+        "testing": true,
+        "dependencyGraph": true
+      },
+      "customRules": [
+        "argon-safety", "bulk-purchase-api", "canvas-group-clipping",
+        "catalog-api-safety", "eventbridge-lifecycle", "key-constraints",
+        "module-verification", "responsive-design", "studio-limitations",
+        "task-delay-safety", "type-safety-helpers"
+      ],
+      "mcps": ["robloxstudio"]
+    },
+    {
+      "name": "ugc-world-service",
+      "repo": "saddestmartian/ugc-world-service",
+      "stack": ["nodejs"],
+      "kitVersion": null,
+      "lastSync": "2026-04-08",
+      "maturity": "active",
+      "sessions": 67,
+      "features": {
+        "backlog": false,
+        "domains": false,
+        "agents": [],
+        "skills": [],
+        "testing": false,
+        "dependencyGraph": false
+      },
+      "customRules": [],
+      "mcps": ["sqlite"]
+    },
+    {
+      "name": "Stenographer",
+      "repo": "saddestmartian/stenographer",
+      "stack": ["swift"],
+      "kitVersion": null,
+      "lastSync": "2026-04-08",
+      "maturity": "active",
+      "features": {
+        "backlog": false,
+        "domains": false,
+        "agents": [],
+        "skills": ["video-toolkit"],
+        "testing": false,
+        "dependencyGraph": false
+      },
+      "customRules": [],
+      "mcps": []
+    },
+    {
+      "name": "Invite-Influence",
+      "repo": "saddestmartian/Invite-Influence",
+      "stack": ["nodejs", "typescript"],
+      "kitVersion": null,
+      "lastSync": "2026-04-08",
+      "maturity": "active",
+      "sessions": 64,
+      "features": {
+        "backlog": false,
+        "domains": false,
+        "agents": [],
+        "skills": [],
+        "testing": true,
+        "dependencyGraph": false
+      },
+      "customRules": [],
+      "mcps": []
+    },
+    {
+      "name": "chaos-carl-bot",
+      "repo": "saddestmartian/chaos-carl-bot",
+      "stack": ["nodejs"],
+      "kitVersion": null,
+      "lastSync": "2026-04-08",
+      "maturity": "active",
+      "sessions": 30,
+      "features": {
+        "backlog": false,
+        "domains": false,
+        "agents": [],
+        "skills": [],
+        "testing": false,
+        "dependencyGraph": false
+      },
+      "customRules": [],
+      "mcps": []
+    },
+    {
+      "name": "Blarvis",
+      "repo": "saddestmartian/Blarvis",
+      "stack": ["nodejs"],
+      "kitVersion": null,
+      "lastSync": "2026-04-08",
+      "maturity": "early",
+      "sessions": 4,
+      "features": {
+        "backlog": false,
+        "domains": false,
+        "agents": [],
+        "skills": [],
+        "testing": false,
+        "dependencyGraph": false
+      },
+      "customRules": [],
+      "mcps": []
+    },
+    {
+      "name": "TableCapture",
+      "repo": "saddestmartian/TableCapture",
+      "stack": ["typescript"],
+      "kitVersion": null,
+      "lastSync": "2026-04-08",
+      "maturity": "active",
+      "features": {
+        "backlog": false,
+        "domains": false,
+        "agents": [],
+        "skills": [],
+        "testing": false,
+        "dependencyGraph": false
+      },
+      "customRules": [],
+      "mcps": ["playwright"]
+    }
+  ]
+}

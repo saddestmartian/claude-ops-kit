@@ -1,0 +1,69 @@
+# macOS Setup & Session Start Checks
+
+## First-Time Setup (run once per machine)
+
+### 1. Prerequisites
+```bash
+brew install gh jq {{EXTRA_BREW_PACKAGES}}
+```
+
+### 2. Project-Specific Tools
+{{TOOL_INSTALL_INSTRUCTIONS}}
+
+### 3. Git Hooks
+```bash
+git config core.hooksPath .githooks
+```
+Verify: `git config core.hooksPath` → `.githooks`
+
+### 4. GitHub CLI Auth
+```bash
+gh auth login           # browser-based OAuth
+```
+Verify: `gh auth status`
+
+### 5. Environment File
+Create `.env` in repo root (gitignored):
+```
+GH_TOKEN=ghp_your_token_here
+```
+Used for GitHub API fallback when `gh` CLI isn't available (cloud sessions).
+
+### 6. MCP Servers (machine-local, not repo-tracked)
+Configure in `~/.claude/mcp.json` (global):
+```json
+{
+  "mcpServers": {
+    {{MCP_CONFIG}}
+  }
+}
+```
+
+---
+
+## Session Start Validation (run every session)
+
+```bash
+# 1. Pull latest and verify branch
+git fetch --prune origin
+git checkout main
+git pull origin main
+
+# 2. Import memory
+bash scripts/sync-memory.sh import
+
+# 3. Verify git hooks
+git config core.hooksPath   # must return .githooks
+
+# 4. Verify GitHub auth
+gh auth status
+
+# 5. Check for uncommitted changes or stashes
+git status
+git stash list
+
+# 6. Read project state
+# Then read PROJECT_STATE.md for current priorities and context
+```
+
+If any step fails, fix it before starting work.

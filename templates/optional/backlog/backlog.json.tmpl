@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "project": "{{PROJECT_NAME}}",
+    "taskPrefix": "{{TASK_PREFIX}}",
+    "schema": {
+      "types": ["Feature", "Bug", "QOL", "Tech Debt", "Enhancement", "Delighter"],
+      "statuses": ["Backlog", "Not started", "Blocked", "Deferred", "In progress", "In Review", "Testing", "Merged", "Verified", "Done"],
+      "priorities": ["Critical", "High", "Medium", "Low"],
+      "efforts": ["XS", "S", "M", "L", "XL"]
+    }
+  },
+  "tasks": [
+    {
+      "id": "{{TASK_PREFIX}}-1",
+      "title": "Initial project setup",
+      "description": "Set up project structure, tooling, and CI/CD",
+      "status": "Done",
+      "type": "Tech Debt",
+      "priority": "Critical",
+      "effort": "M",
+      "session": "S1",
+      "userComments": "",
+      "claudeComments": "Initialized with claude-ops-kit"
+    }
+  ]
+}

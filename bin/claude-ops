@@ -1,0 +1,79 @@
+#!/bin/bash
+# claude-ops — CLI for Claude Operations Kit
+# Bootstrap, manage, and upgrade Claude Code project workflows.
+
+set -euo pipefail
+
+VERSION="1.0.0"
+
+# Resolve kit root (where this script lives → parent)
+KIT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+usage() {
+    cat <<EOF
+claude-ops v${VERSION} — Claude Operations Kit
+
+Usage:
+  claude-ops <command> [options]
+
+Commands:
+  init          Bootstrap a new project with Claude Code workflow
+  upgrade       Pull updated templates from kit into current project
+  register      Register current project in the cross-project registry
+  new-skill     Scaffold a new skill
+  new-agent     Scaffold a new agent
+  new-rule      Scaffold a new rule
+  status        Show kit version and project health
+  retro         Generate a retrospective template
+  version       Show version
+
+Run 'claude-ops <command> --help' for details on each command.
+EOF
+}
+
+case "${1:-}" in
+    init)
+        shift
+        bash "$KIT_ROOT/scripts/init.sh" "$KIT_ROOT" "$@"
+        ;;
+    upgrade)
+        shift
+        bash "$KIT_ROOT/scripts/upgrade.sh" "$KIT_ROOT" "$@"
+        ;;
+    register)
+        shift
+        bash "$KIT_ROOT/scripts/register.sh" "$KIT_ROOT" "$@"
+        ;;
+    new-skill)
+        shift
+        bash "$KIT_ROOT/scripts/new-skill.sh" "$KIT_ROOT" "$@"
+        ;;
+    new-agent)
+        shift
+        bash "$KIT_ROOT/scripts/new-agent.sh" "$KIT_ROOT" "$@"
+        ;;
+    new-rule)
+        shift
+        bash "$KIT_ROOT/scripts/new-rule.sh" "$KIT_ROOT" "$@"
+        ;;
+    status)
+        shift
+        bash "$KIT_ROOT/scripts/status.sh" "$KIT_ROOT" "$@"
+        ;;
+    retro)
+        shift
+        bash "$KIT_ROOT/scripts/retro.sh" "$KIT_ROOT" "$@"
+        ;;
+    version|--version|-v)
+        echo "claude-ops v${VERSION}"
+        ;;
+    help|--help|-h|"")
+        usage
+        ;;
+    *)
+        echo "Unknown command: $1"
+        echo ""
+        usage
+        exit 1
+        ;;
+esac

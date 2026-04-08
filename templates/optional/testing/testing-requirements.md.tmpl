@@ -1,0 +1,37 @@
+## Testing Requirements
+
+Tests protect invariants and catch regressions — not verify pixels.
+
+### Unit + Integration Tests REQUIRED When:
+- Modifying a module that has a test file → existing tests must pass + new behavior needs coverage
+- Fixing a bug → regression test proving the bug is dead
+- Adding/modifying logic with domain invariants (caps, limits, validation rules)
+- Changing a public module API consumed by other modules
+- New critical-path module → test file required before Done
+
+### Functional Smoke Tests RECOMMENDED Pre-Merge When:
+- Change touches payment/purchase flow
+- Change touches server↔client communication
+- Change modifies core state machine logic
+
+### Manual E2E Required Post-Merge When:
+- Mobile/responsive UI changes
+- New screen/panel added
+- Platform-specific behavior changes
+
+### Tests NOT Required:
+- Pure UI styling (colors, sizes, font, layout tweaks)
+- Documentation, tracking files, config updates
+- Presentational components with no business logic
+
+### Decision Tree
+1. Does this change touch business logic or domain invariants? → Unit test required
+2. Does this change affect how modules communicate? → Integration test required
+3. Does this change affect a user-facing flow? → Functional smoke test recommended
+4. Does this change affect visual layout or platform behavior? → Manual E2E checklist
+5. None of the above → Lint gate is sufficient
+
+### Execution
+```bash
+{{TEST_CMD}}
+```

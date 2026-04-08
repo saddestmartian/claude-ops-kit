@@ -1,0 +1,64 @@
+{
+  "tools": [
+    {
+      "name": "gh",
+      "description": "GitHub CLI — PRs, issues, API calls",
+      "install": {
+        "macos": "brew install gh",
+        "windows": "winget install GitHub.cli"
+      },
+      "usedBy": ["ugc-world", "ugc-world-service", "Invite-Influence", "chaos-carl-bot", "Blarvis", "TableCapture", "Stenographer"],
+      "required": true
+    },
+    {
+      "name": "jq",
+      "description": "JSON processor — backlog queries, verify-sync",
+      "install": {
+        "macos": "brew install jq",
+        "windows": "winget install jqlang.jq"
+      },
+      "usedBy": ["*"],
+      "required": true
+    },
+    {
+      "name": "ffmpeg",
+      "description": "Media processing — video analysis, audio extraction",
+      "install": {
+        "macos": "brew install ffmpeg",
+        "windows": "winget install Gyan.FFmpeg"
+      },
+      "usedBy": ["ugc-world", "Stenographer"],
+      "required": false
+    },
+    {
+      "name": "node",
+      "description": "Node.js runtime",
+      "install": {
+        "macos": "brew install node",
+        "windows": "winget install OpenJS.NodeJS"
+      },
+      "usedBy": ["ugc-world-service", "Invite-Influence", "chaos-carl-bot", "Blarvis"],
+      "required": false
+    },
+    {
+      "name": "python3",
+      "description": "Python 3 — ML scripts, Whisper, data processing",
+      "install": {
+        "macos": "brew install python",
+        "windows": "winget install Python.Python.3.12"
+      },
+      "usedBy": ["ugc-world", "Stenographer"],
+      "required": false
+    },
+    {
+      "name": "aftman",
+      "description": "Roblox toolchain manager — selene, stylua, wally, argon",
+      "install": {
+        "macos": "brew install aftman",
+        "windows": "Download from https://github.com/LPGhatguy/aftman/releases"
+      },
+      "usedBy": ["ugc-world"],
+      "required": false
+    }
+  ]
+}

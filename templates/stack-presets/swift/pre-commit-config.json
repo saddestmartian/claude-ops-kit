@@ -1,0 +1,5 @@
+{
+  "lint": "swiftlint",
+  "format": "swiftformat --lint .",
+  "test": "swift test"
+}

@@ -1,0 +1,23 @@
+# {{PROJECT_NAME}} — Claude Memory
+
+## Critical Workflow Rules
+- Always start from latest `main` before branching
+- Branch-aware reads: verify branch before reading backlog.json or PROJECT_STATE.md
+- Post-compaction: don't trust task status claims without verifying against backlog.json
+
+## Task Ledger (recently completed / in-progress)
+Source of truth is `backlog.json` on main — this is a quick-reference cache.
+
+### Recently Completed
+- *(none yet)*
+
+### In Progress
+- *(none yet)*
+
+## Patterns & Conventions
+- *(accumulated during sessions — patterns, conventions, verified behaviors)*
+
+## Cross-Machine Sync
+Memory files are synced via `scripts/sync-memory.sh`. Export runs during `/handoff`, import runs at session start.
+- Git-tracked backup: `.claude/memory-sync/`
+- Operational rules: `.claude/rules/` (auto-loaded, no import needed)

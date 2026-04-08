@@ -1,0 +1,64 @@
+# Skill: Session Handoff (`/handoff`)
+
+## When to Use
+End of a session when work is incomplete or paused — preserves context for the next session.
+Use when the user says "wrap up" / "handoff" / "end session".
+
+**Not a substitute for `/pr`.** If work is functionally complete and ready to merge, use `/pr` first, then `/handoff` for context continuity.
+
+## Procedure
+
+### 1. Gather Session Context
+- Run `git log --oneline` since session start to identify all changes
+- Read `backlog.json` on current branch to get task statuses touched this session
+- Note any open PRs: `gh pr list --state open`
+
+### 2. Build Handoff Summary
+Write/update `PROJECT_STATE.md` with these sections:
+
+```markdown
+## Session Summary — YYYY-MM-DD
+
+### Completed
+- [{{TASK_PREFIX}}-XXX] Description (PR #N — merged/open)
+- ...
+
+### Next Up (priority order)
+1. [{{TASK_PREFIX}}-XXX] Description — why it's next
+2. ...
+
+### Known Issues / Gotchas
+- Issue description — context on why it matters
+
+### Starter Prompt
+> Paste-ready prompt for the next session to resume seamlessly.
+> Include: branch to start from, task IDs to pick up, any setup steps.
+```
+
+- **Retain the 3 most recent session summaries.** Prune older ones (full history is in git log).
+
+### 3. Sync Tracking & Reference Files
+Run these checks and fix any drift:
+- `backlog.json` — update statuses and `claudeComments` for all tasks touched
+- `REFERENCE_MAP.md` — if modules were added/removed/renamed, update entries and line counts
+- `CLAUDE.md` — if architecture, conventions, or patterns changed this session, reflect them
+- `.claude/MEMORY.md` — verify task ledger matches backlog for recently-touched tasks
+
+### 4. Verify Sync
+- Run `scripts/verify-sync.sh` — check consistency
+- Run `{{LINT_CMD}}` and `{{FORMAT_CMD}}` — ensure no regressions
+
+### 5. Export Memory
+- Run `scripts/sync-memory.sh export` to sync memory files to git-tracked `.claude/memory-sync/`
+
+### 6. Commit & PR
+- Stage tracking/reference file changes: `git add PROJECT_STATE.md backlog.json REFERENCE_MAP.md CLAUDE.md .claude/`
+- Commit: `git commit -m "chore: session handoff — <brief summary>"`
+- Push: `git push -u origin HEAD`
+- Create PR if on a feature branch
+- Output the PR URL
+
+## Rules
+- Never skip the sync step (#3) — stale tracking files cause wrong assumptions in future sessions
+- Always verify against actual code before asserting a task is Done
+- The starter prompt must be specific enough that a fresh context can resume without re-reading the full backlog

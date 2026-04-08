@@ -1,0 +1,25 @@
+#!/bin/sh
+# pre-commit hook — format check + lint gate
+# Installed by claude-ops-kit. Configure commands in claude-ops.json.
+
+set -e
+
+echo "Running pre-commit checks..."
+
+# Stage 1: Format check
+echo "  [1/2] Format check..."
+{{FORMAT_CMD}}
+if [ $? -ne 0 ]; then
+    echo "❌ Format check failed. Run your formatter to fix."
+    exit 1
+fi
+
+# Stage 2: Lint
+echo "  [2/2] Lint..."
+{{LINT_CMD}}
+if [ $? -ne 0 ]; then
+    echo "❌ Lint failed. Fix errors before committing."
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed."

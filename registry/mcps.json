@@ -1,0 +1,49 @@
+{
+  "mcpServers": [
+    {
+      "name": "brave-search",
+      "package": "@modelcontextprotocol/server-brave-search",
+      "transport": "stdio",
+      "envVars": ["BRAVE_API_KEY"],
+      "scope": "global",
+      "platformNotes": {
+        "windows": "Use cmd /c npx wrapper"
+      },
+      "usedBy": ["ugc-world"]
+    },
+    {
+      "name": "playwright",
+      "package": "@playwright/mcp@latest",
+      "transport": "stdio",
+      "envVars": [],
+      "scope": "global",
+      "usedBy": ["ugc-world", "TableCapture"]
+    },
+    {
+      "name": "sqlite",
+      "package": "mcp-sqlite-server",
+      "transport": "stdio",
+      "envVars": [],
+      "scope": "global",
+      "usedBy": ["ugc-world-service"]
+    },
+    {
+      "name": "robloxstudio",
+      "package": "robloxstudio-mcp@latest",
+      "transport": "stdio",
+      "scope": "project",
+      "platformNotes": {
+        "windows": "Must use cmd /c npx wrapper",
+        "cloud": "Not available — requires local Roblox Studio"
+      },
+      "usedBy": ["ugc-world"]
+    },
+    {
+      "name": "notion",
+      "package": "@anthropic/mcp-notion",
+      "transport": "oauth",
+      "scope": "global",
+      "usedBy": []
+    }
+  ]
+}

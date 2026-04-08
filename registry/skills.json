@@ -1,0 +1,28 @@
+{
+  "skills": [
+    {
+      "name": "handoff",
+      "source": "baseline",
+      "description": "Session handoff — preserve context for next session",
+      "usedBy": ["ugc-world"]
+    },
+    {
+      "name": "pr",
+      "source": "optional",
+      "description": "PR creation with lint/test gates",
+      "usedBy": ["ugc-world"]
+    },
+    {
+      "name": "design-system",
+      "source": "custom",
+      "description": "Design system documentation and consultation",
+      "usedBy": ["ugc-world"]
+    },
+    {
+      "name": "video-toolkit",
+      "source": "optional",
+      "description": "Video analysis with FFmpeg + Whisper",
+      "usedBy": ["ugc-world"]
+    }
+  ]
+}

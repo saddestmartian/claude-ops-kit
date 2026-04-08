@@ -1,0 +1,92 @@
+# Windows Setup & Session Start Checks
+
+## First-Time Setup (run once per machine)
+
+### 1. Prerequisites
+```powershell
+# Via Homebrew (if available)
+brew install gh jq {{EXTRA_BREW_PACKAGES}}
+
+# Alternative: native Windows
+winget install GitHub.cli
+winget install jqlang.jq
+{{EXTRA_WINGET_PACKAGES}}
+```
+
+### 2. Project-Specific Tools
+{{TOOL_INSTALL_INSTRUCTIONS}}
+
+### 3. Git Hooks
+```powershell
+git config core.hooksPath .githooks
+```
+Verify: `git config core.hooksPath` → `.githooks`
+
+Note: Git hooks use `#!/bin/sh` shebangs. Git for Windows includes Git Bash for hook execution.
+
+### 4. GitHub CLI Auth
+```powershell
+gh auth login           # browser-based OAuth
+```
+Verify: `gh auth status`
+
+### 5. Environment File
+Create `.env` in repo root (gitignored):
+```
+GH_TOKEN=ghp_your_token_here
+```
+
+### 6. MCP Servers (machine-local, not repo-tracked)
+Configure in `~/.claude/mcp.json` (global):
+```json
+{
+  "mcpServers": {
+    {{MCP_CONFIG}}
+  }
+}
+```
+
+**Windows note:** MCP servers using `"command": "npx"` may need a `cmd /c` wrapper:
+```json
+{
+  "command": "cmd",
+  "args": ["/c", "npx", "-y", "package-name"]
+}
+```
+
+### Windows-Specific Notes
+- **Shell scripts:** All `scripts/*.sh` files use Bash. Run via Git Bash or `bash` command.
+- **Line endings:** Ensure `git config core.autocrlf input` to avoid CRLF issues.
+- **MCP servers with `npx`:** Override with `cmd /c npx` wrapper. Run `claude /doctor` to check.
+
+---
+
+## Session Start Validation (run every session)
+
+```powershell
+# 1. Pull latest and verify branch
+git fetch --prune origin
+git checkout main
+git pull origin main
+
+# 2. Import memory (via Git Bash)
+bash scripts/sync-memory.sh import
+
+# 3. Verify git hooks
+git config core.hooksPath   # must return .githooks
+
+# 4. Verify GitHub auth
+gh auth status
+
+# 5. Check for uncommitted changes or stashes
+git status
+git stash list
+
+# 6. Verify line ending config
+git config core.autocrlf    # should return "input"
+
+# 7. Read project state
+# Then read PROJECT_STATE.md for current priorities and context
+```
+
+If any step fails, fix it before starting work.

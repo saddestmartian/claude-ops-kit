@@ -1,0 +1,46 @@
+# Create PR Skill
+
+Use when a session's work is functionally complete and ready to merge.
+
+## Pre-PR Validation
+
+### Step 1: Lint & Format
+- Run `{{LINT_CMD}}` — **block if any errors**
+- Run `{{FORMAT_CMD}}` — **block if fails**
+
+### Step 2: Sync Check
+- Run `scripts/verify-sync.sh` — warn on drift (REFERENCE_MAP, backlog sync)
+
+### Step 3: Test Gate (diff-driven)
+Analyze the diff (`git diff main...HEAD --name-only`) against testing requirements:
+
+**Run tests if ANY of these are true:**
+- Changed files include a module that has a test file
+- Changed files touch domain invariant logic
+- This branch includes a bug fix
+
+**Test execution:**
+```bash
+{{TEST_CMD}}
+```
+**Block PR if any test fails.** Show failures to user.
+
+**Skip tests if:**
+- Only documentation, tracking files, config, or pure UI styling changed
+- No test files exist for any changed module (note in PR description)
+
+### Step 4: Review Changes
+- Run `git diff main...HEAD --stat` to summarize
+- Check for any files that shouldn't be committed (.env, credentials, large binaries)
+
+## PR Creation
+
+1. Run `git status` to check for uncommitted changes
+2. Verify auth: `gh auth status` — if fails, ask user for token
+3. Push current branch: `git push -u origin HEAD`
+4. Create PR with:
+   - Conventional title from branch/commits
+   - Summary of changes
+   - Test results (pass/skip/coverage gaps)
+   - Lint/format status
+5. Output the PR URL

@@ -1,0 +1,70 @@
+# Cloud Setup & Session Start Checks
+
+Cloud = Claude Code running via mobile app, desktop app (cloud mode), or claude.ai/code — execution happens on Anthropic's infrastructure, not your local machine.
+
+## Limitations in Cloud Mode
+- **No local tools** — project-specific linters/formatters not installed
+- **No `gh` CLI** — use `curl` with bearer token for GitHub API
+- **No `.env` file** — tokens must be provided at session start
+
+Cloud mode is best for: planning, code review, writing code, backlog management, documentation, research.
+
+## Session Start (Cloud)
+
+### 1. User Provides Token
+At the start of every cloud session, provide your GitHub token:
+```
+My GH_TOKEN is: ghp_xxxx
+```
+
+### 2. Proxy Configuration
+Cloud environments may require a proxy for external API calls:
+```bash
+export https_proxy="$GLOBAL_AGENT_HTTP_PROXY"
+```
+
+### 3. GitHub API (replaces `gh` CLI)
+```bash
+# Verify token works
+curl -s -H "Authorization: Bearer $GH_TOKEN" \
+     -H "Accept: application/vnd.github+json" \
+     https://api.github.com/user | head -5
+
+# Create PR
+curl -s -X POST \
+     -H "Authorization: Bearer $GH_TOKEN" \
+     -H "Accept: application/vnd.github+json" \
+     https://api.github.com/repos/{{GITHUB_ORG}}/{{PROJECT_NAME}}/pulls \
+     -d '{"title":"...","head":"branch","base":"main","body":"..."}'
+```
+
+### 4. Pull Latest & Import Memory
+```bash
+git fetch --prune origin
+git checkout main
+git pull origin main
+bash scripts/sync-memory.sh import
+```
+
+### 5. Read Project State
+Read `PROJECT_STATE.md` for current priorities and context.
+
+## What You CAN Do in Cloud Mode
+- Read and edit all source files
+- Run `git` commands (commit, push, branch, log, diff)
+- Run Bash scripts that don't require local tools
+- Create/manage GitHub PRs and issues via curl
+- Research via web search
+- Plan features, review code, write documentation
+- Update backlog, PROJECT_STATE, REFERENCE_MAP
+
+## What You CANNOT Do in Cloud Mode
+- Run project-specific linters/formatters (not installed)
+- Run project-specific test suites (unless pure CLI)
+- Use local MCP servers
+
+## Workflow Recommendation
+1. Do code writing, planning, and documentation in cloud
+2. Commit and push to a feature branch
+3. Switch to local machine for: lint, format, test, PR validation
+4. Or: trust the pre-commit hooks to catch lint/format issues on the next local commit

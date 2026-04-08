@@ -1,0 +1,42 @@
+# {{PROJECT_NAME}} — Project State
+
+> High-level project context — read this FIRST at every session start. For the full task list, see `backlog.json`. Both files are git-tracked and must stay in sync.
+
+**Last Updated:** {{DATE}}
+**Active Phase:** {{ACTIVE_PHASE}}
+
+**Branch:** `main`
+
+## Current Status
+
+### What's Done
+- Initial project setup ✅
+
+## Active Migrations & Tech Debt
+_Read every session. When touching modules adjacent to these, consider whether addressing the debt makes sense._
+
+| Migration | Status | Affected Modules | Action When Touching |
+|-----------|--------|-----------------|---------------------|
+| *(none yet)* | | | |
+
+### Session 1 Summary ({{DATE}})
+
+**Initial Setup:**
+- Project initialized with claude-ops-kit v{{KIT_VERSION}}
+- CLAUDE.md, PROJECT_STATE.md, REFERENCE_MAP.md created
+- Pre-commit hooks configured
+- Memory sync infrastructure in place
+
+## Next Up (Priority Order)
+1. **Define architecture** — Document the project's module structure in CLAUDE.md
+2. **First feature** — Pick the highest-priority task from backlog.json
+
+## Known Issues / Gotchas
+- *(none yet)*
+
+## Starter Prompt
+> S2 — Starting fresh.
+>
+> READ FIRST: `PROJECT_STATE.md` for session context.
+>
+> Setup: `bash scripts/sync-memory.sh import`

@@ -1,0 +1,190 @@
+# {{PROJECT_NAME}} — Claude Code Root Instructions
+
+> {{PROJECT_DESCRIPTION}}
+
+## Most Critical Rules (Read First — Highest Friction Areas)
+
+These five rules address the most common failure modes. They are summarized here for visibility; detailed versions appear in `.claude/rules/`.
+
+1. **Investigation-First.** When modifying existing code, your first action MUST be read-only. Trace the execution path before writing anything. Do NOT apply a second fix on top of a failed first fix — re-investigate from the entry point.
+2. **Stop on Stacking Fixes.** If fix #2 compensates for fix #1, STOP and report to the user. The assumption behind fix #1 was wrong.
+3. **Git Safety.** Never silently resolve merge conflicts — flag all conflicts with before/after context and get approval. Never stash or discard uncommitted changes without showing what would be lost.
+4. **Phase Gates for Large Tasks.** When a task involves 3+ files or 2+ modules: complete read/plan phase → report → implement first module → report → continue only after confirmation.
+5. **Confidence Flagging.** When touching external APIs or platform behavior: mark ✅ VERIFIED, ⚠️ ASSUMED, or ❓ UNVERIFIED.
+
+## Workflow Rules
+- **Verify before assuming.** Always check actual code/docs/backlog state before starting work. Never assume a task is pending — confirm it hasn't already been completed.
+- **Confirm scope first.** Before implementing multiple items from a plan, list what you found and confirm with the user which items are truly pending.
+- **Concise responses.** Don't narrate what you're about to do — do it. Report findings, then ask for direction.
+
+## Architecture
+
+{{ARCHITECTURE_SECTION}}
+
+## Session Start
+
+**Platform-specific setup & validation:** See `.claude/setup/` for per-platform checklists:
+- `.claude/setup/macos.md` — macOS
+- `.claude/setup/windows.md` — Windows
+- `.claude/setup/cloud.md` — Cloud environments
+
+Run the relevant platform checklist on first session per machine. The steps below are universal:
+
+1. **Import memory:** Run `scripts/sync-memory.sh import` — restores project context from git-tracked backup.
+2. Read `PROJECT_STATE.md` for current progress, active work, and blockers
+3. Run `git log --oneline -10` to see recent commits
+4. If you need to pick a task or check the full backlog, read `backlog.json`
+5. Load GitHub token: `export GH_TOKEN=$(grep GH_TOKEN .env | cut -d= -f2)` (if `.env` exists)
+6. Verify pre-commit hooks: `git config core.hooksPath` must return `.githooks`. If not, run `git config core.hooksPath .githooks`.
+7. **Git health check:** `git fetch --prune origin`, check for uncommitted changes or stashes, verify current branch sync with remote. Report summary.
+8. **Verify task state:** Before starting work on any task, check actual code/docs to confirm the task is truly pending.
+
+## Task Tracking — Two Files, Two Purposes
+
+### `PROJECT_STATE.md` — Session Context (read every session)
+High-level project state: what phase we're in, what's done, what's in progress, recent decisions, blockers, and the next 3-5 tasks. Updated at the end of every session.
+
+### `backlog.json` — Full Backlog (read when needed)
+The complete task inventory — every open, in-progress, and completed task. JSON format, git-tracked, single source of truth.
+
+**When to update `backlog.json`:**
+- A task's status changes (Not started → In progress → Done)
+- You discover a new bug or task — add with the next available ID: `jq '[.tasks[].id | ltrimstr("{{TASK_PREFIX}}-") | tonumber] | max + 1' backlog.json`
+- Update the `claudeComments` field with context about what happened
+
+Both files must stay in sync. If you mark a task Done in `backlog.json`, make sure `PROJECT_STATE.md` reflects that progress.
+
+**Branch-aware reads (CRITICAL):** Always verify you're on `main` (or the correct branch) before reading `backlog.json` or `PROJECT_STATE.md` to answer questions about task state. Feature branches carry stale copies.
+
+## GitHub Integration
+**Local (default):** Use `gh` CLI for PRs, issues, and API calls.
+
+**Cloud/proxy fallback:** When running in a cloud environment, `gh` CLI may not be available. Use `curl` with bearer token:
+```bash
+export https_proxy="$GLOBAL_AGENT_HTTP_PROXY"
+curl -s -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/...
+```
+
+**Auth verification:** Before creating PRs or pushing, verify auth works (`gh auth status` locally, or test the token with `curl` in cloud). If it fails, ask the user for a fresh token immediately.
+
+## Critical Rules
+
+### Milestone Reporting Protocol (NON-NEGOTIABLE)
+Report progress at natural milestones — not after an arbitrary tool count. For large tasks (3+ files), report after each discrete unit of work completes. Never go silent through an entire multi-file change.
+
+### Git Safety (Merge Conflicts & Stash)
+- **Never silently resolve merge conflicts.** Flag all conflicts with before/after context.
+- **Never stash or discard uncommitted changes without investigating.** Show what would be lost.
+
+### Anti-Spiral Rules
+1. **Clarify before coding.** If a request is ambiguous, STOP and ask.
+2. **Detect stacking fixes.** If fix #2 compensates for fix #1, STOP and report.
+3. **Three Whiffs.** Three "found it / wait actually" cycles = STOP.
+4. **Scope escalation.** If work exceeds 3+ files or has architectural implications, discuss before continuing.
+5. **Implementation-first thinking.** Before patching a bug, ask: "What would correct code look like from scratch?"
+6. **Verify before implementing.** Before starting a multi-item plan, check actual codebase state for each item.
+
+### Investigation-First Protocol
+When modifying existing code or debugging:
+1. **First action MUST be read-only** — trace the execution path.
+2. **Verify the module is actively used** — search for imports/requires. Zero matches = dead code.
+3. **Read the calling code**, not just the target code.
+4. **If a change doesn't produce expected results:** STOP. Don't apply a second fix on top. Re-investigate.
+
+### Confidence Flagging
+When writing code that touches external APIs: ✅ **VERIFIED**, ⚠️ **ASSUMED**, ❓ **UNVERIFIED**.
+
+### Code Discipline
+- Descriptive variable names — no abbreviations in business logic
+- Read target area before every edit. Verify line numbers.
+- Surgical edits only. One module at a time.
+- **New functions must be <60 lines.** Existing long functions grandfathered.
+- **REFERENCE_MAP.md sync** — any new/removed/renamed module MUST be reflected.
+
+### Linting (MANDATORY)
+- `{{LINT_CMD}}` before every commit — zero errors
+- `{{FORMAT_CMD}}` before every commit — must pass
+- Pre-commit hooks enforce both (`.githooks/pre-commit`)
+
+### Codebase Health Checks
+Before completing any task:
+1. `{{LINT_CMD}}` — zero errors required
+2. `{{FORMAT_CMD}}` — must pass
+3. Verify any new modules are added to REFERENCE_MAP.md
+4. Verify no circular dependencies in import chains
+5. If modified module has a test file, note that tests need verification before marking Done
+
+{{TESTING_SECTION}}
+
+### Bug-Fix Protocol (Test-Driven)
+For each bug:
+1. Read relevant source files — understand current behavior
+2. Write a failing test that reproduces the bug; confirm it fails
+3. Implement the minimal fix
+4. Run full test suite — if any test fails, diagnose and fix (up to 3 retries)
+5. Only move to next bug when ALL tests pass
+6. One atomic commit per bug
+
+## Working Style
+
+### Strategy Mode (Design-Intent-Refine-Pattern)
+Used for: planning features, discussing UX, clarifying intent, making architectural decisions.
+1. **Design** — User describes the vision or problem
+2. **Intent** — Clarify the "why" — user goals, business value, constraints
+3. **Refine** — Explore options, trade-offs, edge cases together
+4. **Pattern** — Capture the decision as a durable pattern (memory, docs, or skill file)
+
+### Implementation Mode (Design-Implement-Review-Push)
+Used for: coding, bug fixes, feature implementation — when plan mode is exited.
+1. **Design** — Plan is approved
+2. **Implement** — Write code, one module at a time, surgical edits
+3. **Review** — Self-check: lint, tests, REFERENCE_MAP updated, no regressions
+4. **Push** — Commit with descriptive message, update tracking files
+
+Never skip Review.
+
+### Model Routing
+- **Opus** — planning, architecture, roadmap, complex design, reviews
+- **Sonnet** — implementation, single-module features, break-fix cycles
+
+## Session Workflow
+
+### During a Session
+- **Branch workflow:** create a feature branch at session start. Never commit directly to main.
+- Commit after every meaningful change with descriptive messages
+- Use `/clear` between unrelated tasks — don't accumulate stale context
+
+### Ending a Session
+Use `/handoff` — it runs the full checklist. In short:
+1. Update `backlog.json` statuses + `claudeComments` for tasks touched
+2. Update `PROJECT_STATE.md` with completed work, next priorities, gotchas, and a starter prompt
+3. Sync reference files: `REFERENCE_MAP.md`, `CLAUDE.md`
+4. Run `scripts/verify-sync.sh` + lint checks
+5. Export memory: `scripts/sync-memory.sh export`
+6. Commit, push, PR
+
+### When Compacting
+Always preserve: the list of modified files, current task state, module dependency relationships, and any unresolved bugs or decisions.
+
+## Do Not
+- Add documentation files unless explicitly asked
+- Auto-commit or auto-push — always wait for user approval
+- Add comments, docstrings, or type annotations to code you didn't change
+- Over-engineer: no abstractions for one-time operations, no feature flags, no backwards-compat shims
+
+## File Organization
+- `PROJECT_STATE.md` — session context. **Read every session.**
+- `backlog.json` — full task inventory. **Read when picking tasks or updating status.**
+- `REFERENCE_MAP.md` — module inventory with line counts and roles.
+- `CLAUDE.md` — these instructions.
+- `.claude/MEMORY.md` — accumulated session memory.
+- `.claude/skills/` — domain-specific guides.
+- `.claude/rules/` — reference rules auto-loaded by Claude Code.
+- `.claude/setup/` — per-platform setup checklists.
+- `scripts/` — automation scripts.
+
+## Search Protocol
+State tool + reason before searching:
+- **Web search** — API docs, specific technical questions
+- **Grep/ripgrep on filesystem** — codebase searches
+- **Perplexity** — deep multi-source research (user runs externally)

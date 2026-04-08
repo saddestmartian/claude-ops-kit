@@ -1,0 +1,5 @@
+{
+  "lint": "npx eslint .",
+  "format": "npx prettier --check .",
+  "test": "npm test"
+}

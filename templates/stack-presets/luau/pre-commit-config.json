@@ -1,0 +1,5 @@
+{
+  "lint": "selene src/",
+  "format": "stylua --check src/",
+  "test": "echo 'Tests run via Roblox Studio playtest'"
+}

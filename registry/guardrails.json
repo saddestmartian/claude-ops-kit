@@ -1,0 +1,46 @@
+{
+  "guardrails": [
+    {
+      "name": "investigation-first",
+      "source": "baseline",
+      "description": "Read-only first action when modifying existing code",
+      "usedBy": ["ugc-world", "ugc-world-service", "Invite-Influence", "chaos-carl-bot"]
+    },
+    {
+      "name": "anti-spiral",
+      "source": "baseline",
+      "description": "Prevent fix-on-fix loops and scope creep",
+      "usedBy": ["ugc-world", "ugc-world-service", "Invite-Influence", "chaos-carl-bot"]
+    },
+    {
+      "name": "git-safety",
+      "source": "baseline",
+      "description": "Never silently resolve conflicts or discard changes",
+      "usedBy": ["ugc-world", "ugc-world-service", "Invite-Influence", "chaos-carl-bot"]
+    },
+    {
+      "name": "phase-gates",
+      "source": "baseline",
+      "description": "Report at checkpoints for multi-file changes",
+      "usedBy": ["ugc-world"]
+    },
+    {
+      "name": "confidence-flagging",
+      "source": "baseline",
+      "description": "Mark API/platform assumptions as VERIFIED/ASSUMED/UNVERIFIED",
+      "usedBy": ["ugc-world"]
+    },
+    {
+      "name": "code-discipline",
+      "source": "baseline",
+      "description": "Surgical edits, 60-line limit, read before edit",
+      "usedBy": ["ugc-world", "ugc-world-service", "Invite-Influence"]
+    },
+    {
+      "name": "milestone-reporting",
+      "source": "baseline",
+      "description": "Report progress at natural milestones",
+      "usedBy": ["ugc-world"]
+    }
+  ]
+}
