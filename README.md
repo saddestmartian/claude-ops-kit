@@ -4,6 +4,37 @@ A project-agnostic bootstrap framework for Claude Code workflows. Initialize any
 
 ## Quick Start
 
+### Option 1: Skill-Driven (Recommended)
+
+The kit onboards your project through a conversation — Claude reads your existing setup, recommends what fits, and intelligently merges. No shell prompts, no yes/no/keep/merge.
+
+```bash
+# 1. Clone the kit
+git clone https://github.com/saddestmartian/claude-ops-kit.git
+
+# 2. Seed the onboarding skill into your project
+cd /path/to/your/project
+bash /path/to/claude-ops-kit/bin/seed.sh
+
+# 3. Open Claude Code and run the skill
+/claude-ops-kit
+```
+
+Claude will auto-detect whether your project needs a fresh init, an adopt/merge, or an upgrade — and walk you through it.
+
+#### Install Globally (available in every project)
+
+If you want `/claude-ops-kit` available in all your projects without seeding each one:
+
+```bash
+mkdir -p ~/.claude/skills
+cp -r /path/to/claude-ops-kit/templates/baseline/claude/skills/claude-ops-kit ~/.claude/skills/
+```
+
+### Option 2: CLI-Driven (Legacy)
+
+Shell-script-driven setup with interactive prompts. Still works, but the skill-driven approach is more intelligent about merging and recommendations.
+
 ```bash
 # 1. Clone the kit
 git clone https://github.com/saddestmartian/claude-ops-kit.git
@@ -14,73 +45,59 @@ bash bin/install.sh
 
 # 3. Initialize a project
 cd /path/to/your/project
-claude-ops init
+claude-ops init     # new project
+claude-ops adopt    # existing project with Claude Code files
+claude-ops upgrade  # already kit-managed, pull updates
 ```
 
 ---
 
-## Commands
+## How `/claude-ops-kit` Works
 
-### `claude-ops init`
+The skill is a single entry point. It assesses your project and routes automatically:
 
-Bootstraps a **new project** from scratch with the full Claude Code workflow infrastructure.
+```
+Is claude-ops-kit installed?
+├── NO → Is the repo empty?
+│   ├── YES → Full init (assess stack, recommend modules, generate)
+│   └── NO  → Adopt/merge (map existing files, intelligently merge)
+│
+└── YES → Compare versions
+    ├── Outdated → Show changes, walk through selective upgrade
+    └── Current  → Offer evaluate, contribute, or re-assess
+```
 
-Walks you through an interactive setup:
-- Project name and task ID prefix
-- Tech stack selection (Node.js, TypeScript, Swift, Python, Luau)
-- Lint/format/test commands (auto-suggested from stack)
-- Optional modules (backlog, agents, skills, testing, etc.)
+### Complexity Profiles
 
-**Safety guard:** Blocks if it detects existing Claude Code files (CLAUDE.md, `.claude/rules/`, etc.) to prevent accidental overwrites. Use `claude-ops adopt` for existing projects instead.
+The skill recommends a profile based on your project signals, but **you always choose**:
 
-| Flag | Effect |
-|------|--------|
-| `--overwrite` | Force init even if existing Claude Code files are found |
-| `--no-discover` | Skip unknown file discovery (for CI / non-interactive use) |
+| Profile | Rules | Best For |
+|---------|-------|----------|
+| **Solo** | 4 core rules | Single-developer, fast iteration |
+| **Team** | All 8 baseline rules + PR automation | Collaborative projects, vibecoders who want strong guardrails |
+| **Enterprise** | All rules + hooks-enforced gates + audit trail | Compliance, large teams, required reviews |
 
-### `claude-ops adopt`
+### Contribution Pipeline
 
-Integrates the kit into an **existing project** that already has some Claude Code setup (CLAUDE.md, rules, skills, etc.) but wasn't bootstrapped by the kit.
+The skill also handles sharing your patterns back to the kit. Custom rules, skills, and learnings from your project can be cataloged, triaged, and fed upstream.
 
-Unlike `init` (which creates everything fresh), `adopt`:
-1. **Scans** what you already have (CLAUDE.md, `.claude/rules/`, skills, scripts, etc.)
-2. **Shows** what exists vs what the kit would add
-3. **Per-component choice**: merge (add missing pieces), skip (keep yours), or replace
-4. **Discovers unknown files** — any `.claude/` content that isn't part of the kit is surfaced for you to remove, keep (with upstream issue filed), or ignore
-5. **Never overwrites** without asking — existing rules and skills are preserved
-6. **Generates** `claude-ops.json` so `upgrade` works going forward
+---
 
-If your CLAUDE.md is missing key sections (investigation-first, anti-spiral, etc.), adopt writes a `CLAUDE.md.kit-reference` alongside your existing file for manual merge.
+## CLI Commands (Legacy)
 
-| Flag | Effect |
-|------|--------|
-| `--no-discover` | Skip unknown file discovery |
-
-### `claude-ops upgrade`
-
-Pulls updated templates from the kit into a project that's already managed by claude-ops.
-
-- Compares your project's `claude-ops.json` version against the kit's `VERSION` file
-- Adds new baseline rules that were introduced since your last upgrade
-- Skips rules you've customized (detects user modifications)
-- Updates `check-version.sh` to the latest and ensures the SessionStart hook is configured
-- Discovers any new unknown `.claude/` files since the last run
-- Updates the manifest version and `kitPath`
-
-| Flag | Effect |
-|------|--------|
-| `--no-discover` | Skip unknown file discovery |
-
-### Other Commands
+These shell-script commands remain available as an alternative to the skill:
 
 | Command | Description |
 |---------|-------------|
-| `claude-ops register` | Register current project in the cross-project registry |
-| `claude-ops new-skill` | Scaffold a new skill in `.claude/skills/` |
-| `claude-ops new-agent` | Scaffold a new agent in `.claude/agents/` |
-| `claude-ops new-rule` | Scaffold a new rule in `.claude/rules/` |
-| `claude-ops status` | Show kit version, project health, and discovered files |
-| `claude-ops retro` | Generate a dated retrospective template |
+| `claude-ops init` | Bootstrap a new project (interactive prompts) |
+| `claude-ops adopt` | Integrate kit into existing project |
+| `claude-ops upgrade` | Pull updated templates |
+| `claude-ops register` | Register project in cross-project registry |
+| `claude-ops new-skill` | Scaffold a new skill |
+| `claude-ops new-agent` | Scaffold a new agent |
+| `claude-ops new-rule` | Scaffold a new rule |
+| `claude-ops status` | Show kit version and project health |
+| `claude-ops retro` | Generate a retrospective template |
 | `claude-ops version` | Show kit version |
 
 ---
