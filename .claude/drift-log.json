@@ -1,0 +1,4 @@
+{
+  "description": "Tracks intentional divergences between installed .claude/rules/ and templates/baseline/claude/rules/. When a rule legitimately differs from the template (e.g., meta-tool-specific adjustment), acknowledge it here so check-drift.sh stops flagging it.",
+  "acknowledged": []
+}

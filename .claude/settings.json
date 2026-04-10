@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/check-version.sh",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "bash scripts/check-drift.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  }
+}

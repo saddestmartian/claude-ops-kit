@@ -1,0 +1,30 @@
+{
+  "version": "1.2.0",
+  "kitRepo": "saddestmartian/claude-ops-kit",
+  "profile": "team",
+  "adoptedFrom": "existing",
+  "selfHosted": true,
+  "project": {
+    "name": "claude-ops-kit",
+    "summary": "Bootstrap framework for Claude Code workflows — templates, registry, playbook, and CLI tools",
+    "repo": "saddestmartian/claude-ops-kit",
+    "stack": ["bash", "markdown", "json"],
+    "taskPrefix": "KIT",
+    "sourceDir": "templates/",
+    "fileExtension": ".md"
+  },
+  "tools": {
+    "lint": "echo 'No lint configured — meta-tool'",
+    "format": "echo 'No formatter configured — meta-tool'",
+    "test": "echo 'No tests configured — meta-tool'"
+  },
+  "features": {
+    "backlog": false,
+    "domains": false,
+    "agents": [],
+    "skills": ["handoff", "claude-ops-kit"],
+    "testing": false,
+    "dependencyGraph": false
+  },
+  "lastUpgrade": "2026-04-10"
+}
