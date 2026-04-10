@@ -41,6 +41,15 @@ build_known_paths() {
         ".claude/skills"
         ".claude/skills/handoff"
         ".claude/skills/handoff/SKILL.md"
+        ".claude/skills/claude-ops-kit"
+        ".claude/skills/claude-ops-kit/SKILL.md"
+        ".claude/skills/claude-ops-kit/procedures"
+        ".claude/skills/claude-ops-kit/procedures/assess.md"
+        ".claude/skills/claude-ops-kit/procedures/init.md"
+        ".claude/skills/claude-ops-kit/procedures/adopt.md"
+        ".claude/skills/claude-ops-kit/procedures/upgrade.md"
+        ".claude/skills/claude-ops-kit/procedures/evaluate.md"
+        ".claude/skills/claude-ops-kit/procedures/contribute.md"
     )
     for p in "${baseline_paths[@]}"; do
         KNOWN_PATHS["$p"]="kit"

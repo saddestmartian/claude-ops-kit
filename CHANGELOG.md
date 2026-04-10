@@ -3,6 +3,28 @@
 All notable changes to claude-ops-kit are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.2.0] - 2026-04-10
+
+### Added
+- **Skill-driven onboarding** — `/claude-ops-kit` skill replaces shell-script-driven init/adopt/upgrade
+  - Single entry point that auto-detects project state and routes to the correct flow
+  - Conversational onboarding instead of yes/no/keep/merge prompts
+  - Intelligent merge that reads and understands existing files before proposing changes
+- **Procedure docs** — modular reference docs for each onboarding flow:
+  - `procedures/assess.md` — 7-category evaluation rubric
+  - `procedures/init.md` — full init for new projects
+  - `procedures/adopt.md` — intelligent merge for existing projects
+  - `procedures/upgrade.md` — version-aware selective upgrade
+  - `procedures/evaluate.md` — project comprehensiveness scoring
+  - `procedures/contribute.md` — share patterns back to the kit
+- **Project evaluation scoring** — 7-category rubric (rules, memory, skills, agents, git, docs, session) with maturity labels
+- **Contribution workflow** — catalog and triage user customizations for potential kit inclusion
+- **Enriched project registry** — `evalScore`, `evalBreakdown`, `installedModules`, `maturity`, `summary` fields
+
+### Changed
+- `registry/projects.json` schema expanded with evaluation and module tracking fields
+- Onboarding is now skill-first; shell scripts (`init.sh`, `adopt.sh`, `upgrade.sh`) remain as legacy fallback
+
 ## [1.1.0] - 2026-04-08
 
 ### Added
