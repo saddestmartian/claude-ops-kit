@@ -1,6 +1,38 @@
 {
   "projects": [
     {
+      "name": "claude-ops-kit",
+      "summary": "Bootstrap framework for Claude Code workflows — templates, registry, playbook, and CLI tools",
+      "repo": "saddestmartian/claude-ops-kit",
+      "stack": ["bash", "markdown", "json"],
+      "kitVersion": "1.2.0",
+      "installedModules": ["baseline"],
+      "evalScore": 5.4,
+      "evalBreakdown": {
+        "rulesCoverage": 8,
+        "memoryHygiene": 3,
+        "skillUsage": 7,
+        "agentTemplates": 0,
+        "gitDiscipline": 5,
+        "documentationQuality": 8,
+        "sessionInfrastructure": 7
+      },
+      "maturity": "functional",
+      "lastAssessed": "2026-04-10",
+      "selfHosted": true,
+      "sessions": 1,
+      "features": {
+        "backlog": false,
+        "domains": false,
+        "agents": [],
+        "skills": ["handoff", "claude-ops-kit"],
+        "testing": false,
+        "dependencyGraph": false
+      },
+      "customRules": [],
+      "mcps": []
+    },
+    {
       "name": "ugc-world",
       "summary": "Roblox UGC marketplace world with storefront, catalog, and purchase systems",
       "repo": "saddestmartian/ugc-world",
