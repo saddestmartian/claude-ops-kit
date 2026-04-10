@@ -52,22 +52,23 @@ Assess which profile fits the project. This affects how many rules, modules, and
 | Existing PR workflow | Informal | Standard | Gated with required checks |
 | Compliance/audit needs | No | Rare | Yes |
 
-Auto-detect from:
+Gather signals to inform a recommendation (do NOT choose automatically):
 - `git shortlog -sn --all` — contributor count
 - `.github/workflows/` or CI config presence
 - Branch protection (if `gh` available: `gh api repos/{owner}/{repo}/branches/main/protection`)
 - Presence of compliance-related files (LICENSE, SECURITY.md, CODEOWNERS)
 
-Confirm with the user:
+Present all three profiles with your recommendation and reasoning, then let the user choose:
 
-> "This looks like a **{detected}** project — {reasoning}. The kit scales its complexity to match:
-> - **Solo** — minimal rules, maximum model freedom, fast iteration
-> - **Team** — full baseline rules + PR automation + coordination patterns
-> - **Enterprise** — full baseline + audit trail + approval gates + compliance hooks
+> "Before we set things up, I want to get the complexity level right. The kit has three profiles:
 >
-> Does **{detected}** sound right?"
+> - **Solo** — minimal rules, maximum model freedom, fast iteration. Best for single-developer projects where speed matters more than process.
+> - **Team** — full baseline rules + PR automation + coordination patterns. Good for collaborative projects where consistency across contributors matters.
+> - **Enterprise** — full baseline + audit trail + approval gates + compliance hooks. For projects with regulatory requirements, large teams, or strict review processes.
+>
+> Based on what I see — {specific signals and reasoning} — I'd suggest **{recommended}**. But this is your call. Which fits best?"
 
-Store as `COMPLEXITY_PROFILE` (solo/team/enterprise) for use by procedures.
+NEVER auto-select. The user must explicitly choose. Store their choice as `COMPLEXITY_PROFILE` (solo/team/enterprise) for use by procedures.
 
 #### What Changes Per Profile
 
