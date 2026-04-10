@@ -3,6 +3,11 @@
 All notable changes to claude-ops-kit are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+- **Chief Designer agent** (optional) — 5-phase design process that produces build-ready specs from code analysis. Complements design-advisor (reviewer) and design-auditor (scanner). Contributed from `saddestmartian/Invite-Influence`.
+
 ## [1.2.0] - 2026-04-10
 
 ### Added

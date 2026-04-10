@@ -1,0 +1,14 @@
+{
+  "contributor": "influence",
+  "repo": "saddestmartian/Invite-Influence",
+  "date": "2026-04-10",
+  "contributions": [
+    {
+      "type": "optional",
+      "artifact": "agents/chief-designer/CLAUDE.md.tmpl",
+      "source": "~/.claude/agents/chief-designer.md",
+      "notes": "New optional agent: Chief Designer. 5-phase design process (understand business logic → infer user intent → walk user journey → design experience → deliver build-ready spec). Complements existing design-advisor (reviewer) and design-auditor (scanner) — this agent is the planner that produces specs before building. Battle-tested on a full settings UI migration from Discord-native to React SPA (1,347-line spec that was directly executed by engineering agents).",
+      "action": "new-agent"
+    }
+  ]
+}
