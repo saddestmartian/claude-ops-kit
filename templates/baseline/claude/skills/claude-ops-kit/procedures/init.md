@@ -5,6 +5,7 @@ Full claude-ops-kit setup for an empty or near-empty repository. This procedure 
 ## Prerequisites
 - `KIT_ROOT` is resolved (the skill router did this)
 - `KIT_VERSION` is known
+- `COMPLEXITY_PROFILE` is determined (solo/team/enterprise)
 - The target project has no existing `claude-ops.json`
 
 ## Phase 1: Gather Project Context
@@ -108,8 +109,12 @@ For each `.tmpl` file, replace all `{{VARIABLE}}` placeholders with the collecte
 
 3. **Claude Code internals:**
    - `.claude/MEMORY.md` from `templates/baseline/claude/MEMORY.md.tmpl`
-   - All files from `templates/baseline/claude/rules/` (copy verbatim)
-   - Stack-specific rules from `templates/stack-presets/{stack}/rules/` (copy verbatim)
+   - **Rules (profile-aware):**
+     - **Solo:** anti-spiral, code-discipline, investigation-first, confidence-flagging, known-traps, workflow-feedback (6 rules)
+     - **Team:** all 8 baseline rules + workflow-feedback + known-traps
+     - **Enterprise:** all 8 baseline rules + workflow-feedback + known-traps
+   - Stack-specific rules from `templates/stack-presets/{stack}/rules/` (all profiles)
+   - Override protocol rule: `override-protocol.md` (all profiles — but solo uses lightweight version)
    - Setup guides from `templates/baseline/claude/setup/` (render templates)
    - Handoff skill from `templates/baseline/claude/skills/handoff/SKILL.md.tmpl` (render)
    - This skill: copy `templates/baseline/claude/skills/claude-ops-kit/` directory (verbatim)
@@ -140,6 +145,7 @@ Create `claude-ops.json` in the project root:
 {
   "version": "{KIT_VERSION}",
   "kitRepo": "saddestmartian/claude-ops-kit",
+  "profile": "{COMPLEXITY_PROFILE}",
   "project": {
     "name": "{PROJECT_NAME}",
     "summary": "{PROJECT_DESCRIPTION}",
@@ -167,6 +173,12 @@ Create `claude-ops.json` in the project root:
 ```
 
 Update the `features` object based on what was actually installed.
+
+### AGENTS.md Generation (Team and Enterprise profiles)
+
+For Team and Enterprise profiles, also generate an `AGENTS.md` file in the project root for cross-tool compatibility (Codex, Copilot, Cursor, Windsurf, etc.). Render from `templates/baseline/AGENTS.md.tmpl`.
+
+Solo profile: skip AGENTS.md unless the user requests it.
 
 ## Phase 5: Configure Git
 

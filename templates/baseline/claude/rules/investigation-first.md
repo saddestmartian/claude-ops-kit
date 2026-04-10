@@ -1,10 +1,9 @@
-## Investigation-First Protocol
+## Investigation-First
 
-When modifying existing code or debugging:
+NEVER write code as your first action when modifying existing code or debugging. First action MUST be read-only: trace the execution path from entry point to target.
 
-1. **First action MUST be read-only** — trace the execution path from entry point to the code you plan to change.
-2. **Verify the module is actively used** — search for imports/requires. If zero matches, it may be dead code. Do NOT edit dead code.
-3. **Read the calling code**, not just the target code — understand how the module is consumed.
-4. **If a change doesn't produce expected results:** STOP. Don't apply a second fix on top. The assumption that led to fix #1 was wrong — re-investigate from the entry point.
+NEVER edit a module without verifying it's actively used — search for imports/requires. Zero matches = dead code, do not touch.
 
-This does NOT apply to greenfield work or simple edits where the path is obvious.
+NEVER apply a follow-up fix without re-investigating — if the first change didn't work, the assumption was wrong.
+
+Exception: greenfield work or trivial edits where the path is obvious.

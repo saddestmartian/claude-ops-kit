@@ -1,0 +1,47 @@
+# AGENTS.md — {{PROJECT_NAME}}
+
+> {{PROJECT_DESCRIPTION}}
+
+## Project Overview
+
+- **Stack:** {{TECH_STACK}}
+- **Source:** {{SOURCE_DIR}}
+- **Primary extension:** {{FILE_EXTENSION}}
+
+## Coding Conventions
+
+- Descriptive variable names — no abbreviations in business logic
+- New functions under 60 lines
+- Surgical edits only — one module at a time
+- Do not add features, refactoring, or documentation beyond what was asked
+
+## Commands
+
+- **Lint:** `{{LINT_CMD}}`
+- **Format:** `{{FORMAT_CMD}}`
+- **Test:** `{{TEST_CMD}}`
+
+Run lint and format before every commit. Zero errors required.
+
+## Behavioral Rules
+
+### Investigation-First
+When modifying existing code, the first action must be read-only. Trace the execution path before writing. Never apply a follow-up fix without re-investigating — if the first change didn't work, the assumption was wrong.
+
+### Anti-Spiral
+Never apply fix-on-fix. If fix #2 compensates for fix #1, stop — the original assumption was wrong. Three failed attempts means step back to first principles. Never expand scope beyond 3 files without discussing first.
+
+### Git Safety
+Never silently resolve merge conflicts. Never stash or discard uncommitted changes without showing what would be lost. Never force-push without explicit approval. Prefer new commits over amends.
+
+### Confidence Flagging
+When touching external APIs or platform behavior, mark confidence: VERIFIED (confirmed via docs/testing), ASSUMED (believed correct, not verified), or UNVERIFIED (guessing, needs research).
+
+## File Organization
+
+- `CLAUDE.md` — Detailed root instructions (Claude Code native)
+- `.claude/rules/` — Behavioral rules auto-loaded by Claude Code
+- `.claude/skills/` — Domain-specific workflow guides
+- `.claude/agents/` — Specialized sub-agent configurations
+- `PROJECT_STATE.md` — Session context and progress tracking
+- `REFERENCE_MAP.md` — Module inventory with line counts

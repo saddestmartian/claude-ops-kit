@@ -16,6 +16,7 @@ This directory contains narrative documentation of our workflow patterns, learni
 - [Trust Erosion Patterns](learnings/trust-erosion-patterns.md) — Actions that break user trust
 - [Compaction Survival](learnings/compaction-survival.md) — Post-compaction verification
 - [Cross-Platform Gotchas](learnings/cross-platform-gotchas.md) — Windows/macOS/Cloud differences
+- [Constraint Budget Research](learnings/constraint-budget-research.md) — Academic findings on rule design, prohibition framing, and complexity profiles
 
 ## Retrospectives
 Session retrospectives are stored in `retrospectives/` with dated filenames.

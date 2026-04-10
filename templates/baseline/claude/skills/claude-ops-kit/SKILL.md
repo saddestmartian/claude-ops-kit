@@ -40,6 +40,59 @@ Check the current project directory for these indicators:
 | Repo is empty | `git log --oneline -1` fails or only has init commit | Brand new project |
 | Repo has code | Source files exist beyond config | Established project |
 
+### Step 3.5: Determine Complexity Profile
+
+Assess which profile fits the project. This affects how many rules, modules, and gates are installed.
+
+| Signal | Solo | Team | Enterprise |
+|--------|------|------|------------|
+| Contributors | 1 | 2-10 | 10+ or compliance requirements |
+| Git remote collaborators | Just the user | Multiple pushers | Protected branches, required reviews |
+| CI/CD present | No or basic | Yes | Yes + approval gates |
+| Existing PR workflow | Informal | Standard | Gated with required checks |
+| Compliance/audit needs | No | Rare | Yes |
+
+Auto-detect from:
+- `git shortlog -sn --all` — contributor count
+- `.github/workflows/` or CI config presence
+- Branch protection (if `gh` available: `gh api repos/{owner}/{repo}/branches/main/protection`)
+- Presence of compliance-related files (LICENSE, SECURITY.md, CODEOWNERS)
+
+Confirm with the user:
+
+> "This looks like a **{detected}** project — {reasoning}. The kit scales its complexity to match:
+> - **Solo** — minimal rules, maximum model freedom, fast iteration
+> - **Team** — full baseline rules + PR automation + coordination patterns
+> - **Enterprise** — full baseline + audit trail + approval gates + compliance hooks
+>
+> Does **{detected}** sound right?"
+
+Store as `COMPLEXITY_PROFILE` (solo/team/enterprise) for use by procedures.
+
+#### What Changes Per Profile
+
+**Solo profile:**
+- Baseline rules: anti-spiral, code-discipline, investigation-first, confidence-flagging (4 rules)
+- Skip: phase-gates, milestone-reporting (solo dev doesn't need self-reporting)
+- Git-safety loaded but relaxed (force-push allowed with confirmation, amend freely)
+- No PR skill by default, no code-reviewer agent
+- Override protocol: lightweight, no expiry tracking
+
+**Team profile:**
+- All 8 baseline rules active
+- PR skill recommended
+- Code-reviewer agent recommended
+- Override protocol with rationale + expiry
+- AGENTS.md generated for cross-tool compatibility
+
+**Enterprise profile:**
+- All 8 baseline rules active
+- All gate rules enforced via hooks where possible (move to `settings.json`)
+- PR skill + code-reviewer + architecture-validator recommended
+- Override protocol with rationale + expiry + logged to registry
+- AGENTS.md generated
+- Audit protocol optional module recommended
+
 ### Step 4: Route
 
 Based on assessment, follow exactly ONE path:

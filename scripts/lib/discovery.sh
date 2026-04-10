@@ -34,6 +34,7 @@ build_known_paths() {
         ".claude/rules/phase-gates.md"
         ".claude/rules/workflow-feedback.md"
         ".claude/rules/known-traps.md"
+        ".claude/rules/override-protocol.md"
         ".claude/setup"
         ".claude/setup/macos.md"
         ".claude/setup/windows.md"

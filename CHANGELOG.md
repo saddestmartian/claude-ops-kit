@@ -20,10 +20,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **Project evaluation scoring** — 7-category rubric (rules, memory, skills, agents, git, docs, session) with maturity labels
 - **Contribution workflow** — catalog and triage user customizations for potential kit inclusion
 - **Enriched project registry** — `evalScore`, `evalBreakdown`, `installedModules`, `maturity`, `summary` fields
+- **Complexity profiles** — Solo/Team/Enterprise tiers scale rule count and module recommendations to match project needs
+- **AGENTS.md template** — cross-tool compatibility (Codex, Copilot, Cursor, Windsurf); generated for Team/Enterprise profiles
+- **Override protocol** — sanctioned escape hatch for baseline rules: state which rule, why, and when the override expires
+- **Constraint budget research** — playbook entry documenting academic findings on rule design, prohibition framing, and cognitive tax
 
 ### Changed
+- **All 8 baseline rules rewritten** — prohibition-first framing ("NEVER do X" degrades slower than "ALWAYS do Y" in long context); effective sub-constraint count reduced from ~28 to ~16
 - `registry/projects.json` schema expanded with evaluation and module tracking fields
 - Onboarding is now skill-first; shell scripts (`init.sh`, `adopt.sh`, `upgrade.sh`) remain as legacy fallback
+- `claude-ops.json` manifest now includes `profile` field (solo/team/enterprise)
 
 ## [1.1.0] - 2026-04-08
 

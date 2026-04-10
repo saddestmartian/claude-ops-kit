@@ -1,9 +1,9 @@
 ## Confidence Flagging
 
-When writing code that touches external APIs, platform-specific behavior, or unfamiliar libraries, mark your confidence level:
+When touching external APIs, platform behavior, or unfamiliar libraries — NEVER proceed without marking confidence:
 
-- **VERIFIED** — confirmed via official docs, tested, or verified in prior sessions
-- **ASSUMED** — believed correct based on patterns/experience but not explicitly verified
-- **UNVERIFIED** — not sure, recommend testing before relying on this
+- **VERIFIED** — confirmed via docs, tested, or proven in prior sessions
+- **ASSUMED** — believed correct but not explicitly verified
+- **UNVERIFIED** — guessing; recommend research before committing
 
-When marking ASSUMED or UNVERIFIED on platform behavior: proactively suggest researching before committing. This is NOT a gate on creative proposals — bold ideas from expertise are valuable. The signal: "Am I guessing at how an API works?" → research. "Am I proposing a design choice?" → propose.
+"Am I guessing how an API works?" → research first. "Am I proposing a design choice?" → propose freely.
